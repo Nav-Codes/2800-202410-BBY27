@@ -5,7 +5,10 @@ const express = require('express');
 const app = express();
 const session = require('express-session');
 const fs = require('fs');
+const path = require('path');
 
+// Serve static files from the dist/exercises directory
+app.use('/exercises', express.static(path.join('exercises')));
 //port
 const port = process.env.PORT || 3000;
 
@@ -77,7 +80,7 @@ app.get('/', (req, res) => {
         const exercisesHTML = exercisesInfo.map(exercise => `
             <li>
                 <h3>${exercise.name}</h3>
-                <img src="exercises/${exercise.images}" alt="${exercise.name}">
+                <img src="./exercises/${exercise.images[0]}" alt="${exercise.name}">
                 <p>${exercise.instructions}</p>
             </li>
         `).join('');
