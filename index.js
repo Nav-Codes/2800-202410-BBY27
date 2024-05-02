@@ -40,6 +40,8 @@ app.get('/', async (req, res) => {
     }
 });
 
+
+
 app.listen(port, () => {
 	console.log("Node application listening on port "+port);
 }); 

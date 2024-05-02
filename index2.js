@@ -1,9 +1,10 @@
-require("./utils.js");
+//require("./utils.js");
 
 //express constants
 const express = require('express');
 const app = express();
 const session = require('express-session');
+const fs = require('fs');
 
 //port
 const port = process.env.PORT || 3000;
@@ -22,8 +23,8 @@ const bcrypt = require('bcrypt');
 
 const Joi = require("joi");
 
-var {database} = include('databaseConnection.js');
-const userCollection = database.db(process.env.MONGODB_DATABASE).collection(process.env.MONGODB_COLLECTION);
+//var {database} = include('databaseConnection.js');
+//const userCollection = database.db(process.env.MONGODB_DATABASE).collection(process.env.MONGODB_COLLECTION);
 
 app.use(express.urlencoded({extended: false}));
 
@@ -51,3 +52,55 @@ app.use(session({
 	resave: true
 }
 ));
+
+app.get('/', (req, res) => {
+    try {
+        // Read the JSON file
+        fs.readFile("./dist/exercises.json", 'utf8', (err, data) => {
+            if (err) {
+                console.error('Error reading file:', err);
+                res.status(500).send('Internal Server Error');
+                return;
+            }
+            
+            // Parse the JSON data
+            const jsonData = JSON.parse(data);
+
+           // Extract names, images, and descriptions from the JSON data
+           const exercisesInfo = jsonData.map(item => ({
+            name: item.name,
+            images: item.images,
+            instructions: item.instructions
+        }));
+        
+        // Generate HTML for each exercise
+        const exercisesHTML = exercisesInfo.map(exercise => `
+            <li>
+                <h3>${exercise.name}</h3>
+                <img src="exercises/${exercise.images}" alt="${exercise.name}">
+                <p>${exercise.instructions}</p>
+            </li>
+        `).join('');
+
+        // Send the list of exercises as response
+        res.send(`
+            <h1>List of Exercises</h1>
+            <ul>${exercisesHTML}</ul>
+        `);
+    });
+    } catch (error) {
+        // Handle error
+        console.error('Error:', error);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
+app.get("*", (req,res) => {
+	res.status(404);
+	res.send("Page not found - 404");
+})
+
+
+app.listen(port, () => {
+	console.log("Node application listening on port "+port);
+}); 
