@@ -9,6 +9,7 @@ const path = require('path');
 
 // Serve static files from the dist/exercises directory
 app.use('/exercises', express.static(path.join('exercises')));
+
 //port
 const port = process.env.PORT || 3000;
 
@@ -55,8 +56,6 @@ app.use(session({
     resave: true
 }
 ));
-
-
 
 
 
@@ -132,7 +131,7 @@ app.post('/loggingin', async (req,res) => {
     var email = req.body.email;
     var password = req.body.password;
 
-	const schema = Joi.string().max(20).required();
+	const schema = Joi.string().email().required();
 	const validationResult = schema.validate(email);
 	if (validationResult.error != null) {
 	   console.log(validationResult.error);
