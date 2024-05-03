@@ -56,111 +56,9 @@ app.use(session({
 }
 ));
 
-app.get('/:id', (req, res) => {
-    try {
-        // Read the JSON file
-        fs.readFile("./dist/exercises.json", 'utf8', (err, data) => {
-            if (err) {
-                console.error('Error reading file:', err);
-                res.status(500).send('Internal Server Error');
-                return;
-            }
 
-            // Parse the JSON data
-            const jsonData = JSON.parse(data);
 
-            const filteredExercises = jsonData.filter(item => item.id === req.params.id);
 
-            // Generate HTML for each exercise
-            const exercisesHTML = filteredExercises.map(exercise => `
-            <h3>${exercise.name}</h3>
-            <img src="./exercises/${exercise.images[0]}" alt="${exercise.name}">
-            <p>level: ${exercise.level}, equipment: ${exercise.equipment}</p>
-            <p>muscles: ${exercise.primaryMuscles}</p>
-            <p>${exercise.instructions}</p>
-        `).join('');
-
-            // Send the list of exercises as response
-            res.send(`
-            <ul>${exercisesHTML}</ul>
-        `);
-        });
-    } catch (error) {
-        // Handle error
-        console.error('Error:', error);
-        res.status(500).send('Internal Server Error');
-    }
-});
-
-app.get('/', (req, res) => {
-    try {
-        // Read the JSON file
-        fs.readFile("./dist/exercises.json", 'utf8', (err, data) => {
-            if (err) {
-                console.error('Error reading file:', err);
-                res.status(500).send('Internal Server Error');
-                return;
-            }
-
-            // Parse the JSON data
-            const jsonData = JSON.parse(data);
-
-            // Calculate pagination parameters
-            const pageSize = 10; // Number of exercises per page
-            const totalPages = Math.ceil(jsonData.length / pageSize);
-            let currentPage = parseInt(req.query.page) || 1; // Default to page 1 if not specified
-            currentPage = Math.min(Math.max(currentPage, 1), totalPages); // Ensure current page is within valid range
-
-            // Calculate the start and end indices of exercises for the current page
-            const startIndex = (currentPage - 1) * pageSize;
-            const endIndex = Math.min(startIndex + pageSize, jsonData.length);
-
-            // Extract names, images, and descriptions from the JSON data for the current page
-            const exercisesInfo = jsonData.slice(startIndex, endIndex).map(item => ({
-                name: item.name,
-                images: item.images,
-                instructions: item.instructions,
-                id: item.id
-            }));
-
-            // Generate HTML for each exercise on the current page
-            const exercisesHTML = exercisesInfo.map(exercise => `
-                <li>
-                    <a href="${exercise.id}">
-                        <h3>${exercise.name}</h3>
-                        <img src="./exercises/${exercise.images[0]}" alt="${exercise.name}">
-                        <p>${exercise.instructions}</p>
-                    </a>
-                </li>
-            `).join('');
-
-            // Generate page counter links
-            const pageLinks = Array.from({ length: totalPages }, (_, index) => index + 1)
-                .map(page => `<a href="/?page=${page}"${page === currentPage ? ' class="active"' : ''}>${page}</a>`)
-                .join(' | ');
-
-            // Send the list of exercises for the current page as response
-            res.send(`
-            Welcome
-            <form action=/createUser method=get> 
-                <button type=submit>Sign Up</button> 
-            </form>
-            <form action="/login" method="get">
-                <button type="submit">Login</button>
-            </form>
-            <h1>List of Exercises</h1>
-            <ul>${exercisesHTML}</ul>
-            <div>
-                Pages: ${pageLinks}
-            </div>
-            `);
-        });
-    } catch (error) {
-        // Handle error
-        console.error('Error:', error);
-        res.status(500).send('Internal Server Error');
-    }
-});
 
 app.get('/createUser', (req,res) => {
     var html = `
@@ -307,7 +205,111 @@ app.get('/loggedin', async (req, res) => {
     }
 });
 
+app.get('/:id', (req, res) => {
+    try {
+        // Read the JSON file
+        fs.readFile("./dist/exercises.json", 'utf8', (err, data) => {
+            if (err) {
+                console.error('Error reading file:', err);
+                res.status(500).send('Internal Server Error');
+                return;
+            }
 
+            // Parse the JSON data
+            const jsonData = JSON.parse(data);
+
+            const filteredExercises = jsonData.filter(item => item.id === req.params.id);
+
+            // Generate HTML for each exercise
+            const exercisesHTML = filteredExercises.map(exercise => `
+            <h3>${exercise.name}</h3>
+            <img src="./exercises/${exercise.images[0]}" alt="${exercise.name}">
+            <p>level: ${exercise.level}, equipment: ${exercise.equipment}</p>
+            <p>muscles: ${exercise.primaryMuscles}</p>
+            <p>${exercise.instructions}</p>
+        `).join('');
+
+            // Send the list of exercises as response
+            res.send(`
+            <ul>${exercisesHTML}</ul>
+        `);
+        });
+    } catch (error) {
+        // Handle error
+        console.error('Error:', error);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
+app.get('/', (req, res) => {
+    try {
+        // Read the JSON file
+        fs.readFile("./dist/exercises.json", 'utf8', (err, data) => {
+            if (err) {
+                console.error('Error reading file:', err);
+                res.status(500).send('Internal Server Error');
+                return;
+            }
+
+            // Parse the JSON data
+            const jsonData = JSON.parse(data);
+
+            // Calculate pagination parameters
+            const pageSize = 10; // Number of exercises per page
+            const totalPages = Math.ceil(jsonData.length / pageSize);
+            let currentPage = parseInt(req.query.page) || 1; // Default to page 1 if not specified
+            currentPage = Math.min(Math.max(currentPage, 1), totalPages); // Ensure current page is within valid range
+
+            // Calculate the start and end indices of exercises for the current page
+            const startIndex = (currentPage - 1) * pageSize;
+            const endIndex = Math.min(startIndex + pageSize, jsonData.length);
+
+            // Extract names, images, and descriptions from the JSON data for the current page
+            const exercisesInfo = jsonData.slice(startIndex, endIndex).map(item => ({
+                name: item.name,
+                images: item.images,
+                instructions: item.instructions,
+                id: item.id
+            }));
+
+            // Generate HTML for each exercise on the current page
+            const exercisesHTML = exercisesInfo.map(exercise => `
+                <li>
+                    <a href="${exercise.id}">
+                        <h3>${exercise.name}</h3>
+                        <img src="./exercises/${exercise.images[0]}" alt="${exercise.name}">
+                        <p>${exercise.instructions}</p>
+                    </a>
+                </li>
+            `).join('');
+
+            // Generate page counter links
+            const pageLinks = Array.from({ length: totalPages }, (_, index) => index + 1)
+                .map(page => `<a href="/?page=${page}"${page === currentPage ? ' class="active"' : ''}>${page}</a>`)
+                .join(' | ');
+
+            // Send the list of exercises for the current page as response
+            res.send(`
+            Welcome
+            <form action=/createUser method=get> 
+                <button type=submit>Sign Up</button> 
+            </form>
+            <form action="/login" method="get">
+                <button type="submit">Login</button>
+            </form>
+            <h1>List of Exercises</h1>
+            <ul>${exercisesHTML}</ul>
+            <div>
+                Pages: ${pageLinks}
+            </div>
+            `);
+        });
+    } catch (error) {
+        // Handle error
+        console.error('Error:', error);
+        res.status(500).send('Internal Server Error');
+    }
+});
 
 app.get("*", (req, res) => {
     res.status(404);
