@@ -1,4 +1,4 @@
-//require("./utils.js");
+require("./utils.js");
 
 //express constants
 const express = require('express');
@@ -26,8 +26,8 @@ const bcrypt = require('bcrypt');
 
 const Joi = require("joi");
 
-//var {database} = include('databaseConnection.js');
-//const userCollection = database.db(process.env.MONGODB_DATABASE).collection(process.env.MONGODB_COLLECTION);
+var {database} = include('databaseConnection.js');
+const userCollection = database.db(process.env.MONGODB_DATABASE).collection(process.env.MONGODB_COLLECTION);
 
 app.use(express.urlencoded({ extended: false }));
 
@@ -141,16 +141,168 @@ app.get('/', (req, res) => {
 
             // Send the list of exercises for the current page as response
             res.send(`
-                <h1>List of Exercises</h1>
-                <ul>${exercisesHTML}</ul>
-                <div>
-                    Pages: ${pageLinks}
-                </div>
+            Welcome
+            <form action=/createUser method=get> 
+                <button type=submit>Sign Up</button> 
+            </form>
+            <form action="/login" method="get">
+                <button type="submit">Login</button>
+            </form>
+            <h1>List of Exercises</h1>
+            <ul>${exercisesHTML}</ul>
+            <div>
+                Pages: ${pageLinks}
+            </div>
             `);
         });
     } catch (error) {
         // Handle error
         console.error('Error:', error);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
+app.get('/createUser', (req,res) => {
+    var html = `
+    Sign Up
+    <form action='/submitUser' method='post'>
+    <input name='name' type='text' placeholder='name'>
+    <input name='email' type='email' placeholder='email'>
+    <input name='password' type='password' placeholder='password'>
+    <button>Submit</button>
+    </form>
+    `;
+    res.send(html);
+});
+
+
+app.post('/submitUser', async (req,res) => {
+    var email = req.body.email;
+    var name = req.body.name;
+    var password = req.body.password;
+
+	const schema = Joi.object(
+		{
+			name: Joi.string().max(50).required(),
+            email: Joi.string().email().required(),
+            password: Joi.string().max(20).required()
+		});
+	
+	const validationResult = schema.validate({email, password, name});
+	if (validationResult.error != null) {
+	   console.log(validationResult.error);
+	   res.redirect("/createUser");
+	   return;
+   }
+
+    var hashedPassword = await bcrypt.hash(password, saltRounds);
+	
+	await userCollection.insertOne({email: email, password: hashedPassword, name: name});
+	console.log("Inserted user");
+
+    // Set user details in the session
+    req.session.authenticated = true;
+    req.session.email = email;
+    req.session.name = name;
+    req.session.cookie.maxAge = expireTime;
+
+    var html = `
+    Successfully Created User
+    <form action="/member" method="get">
+    <button type="submit">Member</button>
+    </form>
+    <form action="/logout" method="get">
+    <button type="submit">LogOut</button>
+    </form>
+    `;
+    res.send(html);
+});
+
+app.get('/login', (req,res) => {
+    var html = `
+    log in
+    <form action='/loggingin' method='post'>
+    <input name='email' type='email' placeholder='email'>
+    <input name='password' type='password' placeholder='password'>
+    <button>Submit</button>
+    </form>
+    `;
+    res.send(html);
+});
+
+app.post('/loggingin', async (req,res) => {
+    var email = req.body.email;
+    var password = req.body.password;
+
+	const schema = Joi.string().max(20).required();
+	const validationResult = schema.validate(email);
+	if (validationResult.error != null) {
+	   console.log(validationResult.error);
+	   res.redirect("/login");
+	   return;
+	}
+
+	const result = await userCollection.find({email: email}).project({email: 1, password: 1, name: 1, _id: 1}).toArray();
+
+	console.log(result);
+	if (result.length != 1) {
+		console.log("user not found");
+		res.redirect("/login");
+		return;
+	}
+    
+    const user = result[0];
+
+	if (await bcrypt.compare(password, result[0].password)) {
+		console.log("correct password");
+		req.session.authenticated = true;
+		req.session.email = user.email;
+        req.session.name = user.name;
+		req.session.cookie.maxAge = expireTime;
+
+		res.redirect('/loggedIn');
+		return;
+	}
+	else {
+		console.log("incorrect password");
+		res.redirect("/login");
+		return;
+	}
+});
+
+app.get('/loggedin', async (req, res) => {
+    if (!req.session.authenticated) {
+        res.redirect('/login');
+        return;
+    }
+
+    try {
+        const email = req.session.email;
+
+        // Fetch the user's name from the database based on their email
+        const user = await userCollection.findOne({ email: email }, { projection: { name: 1 } });
+
+        if (user) {
+            // If user found, display the logged-in message along with the user's name
+            req.session.name = user.name;
+
+            var html = `
+                Welcome ${user.name}!
+                <form action="/member" method="get">
+                    <button type="submit">Member</button>
+                </form>
+                <form action="/logout" method="get">
+                    <button type="submit">Log Out</button>
+                </form>
+            `;
+            res.send(html);
+        } else {
+            // If user not found, log out the user
+            req.session.destroy();
+            res.redirect('/login');
+        }
+    } catch (error) {
+        console.error('Error fetching user:', error);
         res.status(500).send('Internal Server Error');
     }
 });
