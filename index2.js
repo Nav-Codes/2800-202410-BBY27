@@ -126,7 +126,7 @@ app.get('/login', (req,res) => {
     `;
     res.send(html);
 });
-
+ 
 app.post('/loggingin', async (req,res) => {
     var email = req.body.email;
     var password = req.body.password;
