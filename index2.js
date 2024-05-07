@@ -327,7 +327,7 @@ app.post('/search', async (req, res) => {
     var search = req.body.search;
     res.redirect("/?search=" + search);
 });
-
+ 
 
 app.get("*", (req, res) => {
     res.status(404);
