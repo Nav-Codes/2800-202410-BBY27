@@ -6,6 +6,7 @@ const app = express();
 const session = require('express-session');
 const fs = require('fs');
 const path = require('path');
+app.use(express.urlencoded({extended: false}));
 
 // Serve static files from the dist/exercises directory
 app.use('/exercises', express.static(path.join('exercises')));
@@ -30,7 +31,6 @@ const Joi = require("joi");
 var {database} = include('databaseConnection.js');
 const userCollection = database.db(process.env.MONGODB_DATABASE).collection(process.env.MONGODB_COLLECTION);
 
-app.use(express.urlencoded({ extended: false }));
 
 /* secret information section */
 const mongodb_host = process.env.MONGODB_HOST;
@@ -240,6 +240,8 @@ app.get('/:id', (req, res) => {
     }
 });
 
+
+
 app.get('/', (req, res) => {
     try {
         // Read the JSON file
@@ -251,7 +253,10 @@ app.get('/', (req, res) => {
             }
 
             // Parse the JSON data
-            const jsonData = JSON.parse(data);
+            let jsonData = JSON.parse(data);
+            if (req.query.search != null){
+                jsonData = jsonData.filter(item => item.name.toLowerCase().includes(req.query.search));
+                }
 
             // Calculate pagination parameters
             const pageSize = 10; // Number of exercises per page
@@ -273,7 +278,7 @@ app.get('/', (req, res) => {
 
             // Generate HTML for each exercise on the current page
             const exercisesHTML = exercisesInfo.map(exercise => `
-                <li>
+                <li id="${exercise.name}">
                     <a href="${exercise.id}">
                         <h3>${exercise.name}</h3>
                         <img src="./exercises/${exercise.images[0]}" alt="${exercise.name}">
@@ -282,9 +287,15 @@ app.get('/', (req, res) => {
                 </li>
             `).join('');
 
+            let test = "";
+
+            if (req.query.search != null){
+                test = req.query.search;
+            }
+
             // Generate page counter links
             const pageLinks = Array.from({ length: totalPages }, (_, index) => index + 1)
-                .map(page => `<a href="/?page=${page}"${page === currentPage ? ' class="active"' : ''}>${page}</a>`)
+                .map(page => `<a href="/?search=${test}&page=${page}"${page === currentPage ? ' class="active"' : ''}>${page}</a>`)
                 .join(' | ');
 
             // Send the list of exercises for the current page as response
@@ -295,6 +306,11 @@ app.get('/', (req, res) => {
             </form>
             <form action="/login" method="get">
                 <button type="submit">Login</button>
+            </form>
+            <form action="/search" method="post">
+            <input name="search" id="searchbar" class="form-control me-2"
+                type="search" placeholder="Search" aria-label="Search">
+                <button>Submit</button>
             </form>
             <h1>List of Exercises</h1>
             <ul>${exercisesHTML}</ul>
@@ -309,6 +325,12 @@ app.get('/', (req, res) => {
         res.status(500).send('Internal Server Error');
     }
 });
+
+app.post('/search', async (req, res) => {
+    var search = req.body.search;
+    res.redirect("/?search=" + search);
+});
+
 
 app.get("*", (req, res) => {
     res.status(404);
