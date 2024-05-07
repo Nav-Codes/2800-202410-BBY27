@@ -97,7 +97,7 @@ app.post('/submitUser', async (req,res) => {
 
     const result = await userCollection.find({email: email}).project({email: 1, password: 1, name: 1, _id: 1}).toArray();
 
-    if(result[0].email === email || result[0].name === name){
+    if(!(result[0].email === email || result[0].name === name)){
 	await userCollection.insertOne({email: email, password: hashedPassword, name: name});
 	console.log("Inserted user");
 
