@@ -11,6 +11,7 @@ app.use(express.urlencoded({extended: false}));
 // Serve static files from the dist/exercises directory
 app.use('/exercises', express.static(path.join('exercises')));
 
+
 //port
 const port = process.env.PORT || 3000;
 
@@ -31,6 +32,8 @@ const Joi = require("joi");
 var {database} = include('databaseConnection.js');
 const userCollection = database.db(process.env.MONGODB_DATABASE).collection(process.env.MONGODB_COLLECTION);
 
+
+app.set('view engine', 'ejs');
 
 /* secret information section */
 const mongodb_host = process.env.MONGODB_HOST;
@@ -56,8 +59,6 @@ app.use(session({
     resave: true
 }
 ));
-
-
 
 app.get('/createUser', (req,res) => {
     var html = `
@@ -93,7 +94,10 @@ app.post('/submitUser', async (req,res) => {
    }
 
     var hashedPassword = await bcrypt.hash(password, saltRounds);
-	
+
+    const result = await userCollection.find({email: email}).project({email: 1, password: 1, name: 1, _id: 1}).toArray();
+
+    if(result[0].email === email || result[0].name === name){
 	await userCollection.insertOne({email: email, password: hashedPassword, name: name});
 	console.log("Inserted user");
 
@@ -113,6 +117,10 @@ app.post('/submitUser', async (req,res) => {
     </form>
     `;
     res.send(html);
+    }
+    else {
+        res.redirect('/createUser')
+    }
 });
 
 app.get('/login', (req,res) => {
