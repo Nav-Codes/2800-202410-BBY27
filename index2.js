@@ -252,10 +252,13 @@ app.get('/', (req, res) => {
                 return;
             }
 
+            let searchParam = "";
+
             // Parse the JSON data
             let jsonData = JSON.parse(data);
             if (req.query.search != null){
                 jsonData = jsonData.filter(item => item.name.toLowerCase().includes(req.query.search));
+                searchParam = req.query.search;
                 }
 
             // Calculate pagination parameters
@@ -287,15 +290,9 @@ app.get('/', (req, res) => {
                 </li>
             `).join('');
 
-            let test = "";
-
-            if (req.query.search != null){
-                test = req.query.search;
-            }
-
             // Generate page counter links
             const pageLinks = Array.from({ length: totalPages }, (_, index) => index + 1)
-                .map(page => `<a href="/?search=${test}&page=${page}"${page === currentPage ? ' class="active"' : ''}>${page}</a>`)
+                .map(page => `<a href="/?search=${searchParam}&page=${page}"${page === currentPage ? ' class="active"' : ''}>${page}</a>`)
                 .join(' | ');
 
             // Send the list of exercises for the current page as response
