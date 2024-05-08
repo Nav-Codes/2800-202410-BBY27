@@ -14,6 +14,8 @@ app.use('/exercises', express.static(path.join('exercises')));
 //port
 const port = process.env.PORT || 3000;
 
+const bootstrapCDN = `<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">`;
+
 
 require('dotenv').config();
 
@@ -56,6 +58,25 @@ app.use(session({
     resave: true
 }
 ));
+
+function generateDropdownHTML() {
+    return `
+        <div class="dropdown">
+            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Difficulty
+            </button>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                <a class="dropdown-item" href="/filtering/beginner">Beginner</a>
+                <a class="dropdown-item" href="/filtering/intermediate">Intermediate</a>
+                <a class="dropdown-item" href="/filtering/expert">Expert</a>
+            </div>
+        </div>
+    `;
+}
+
+app.get('/filtering/:filter', (req,res) => {
+    res.redirect('/?filter=' + req.params.filter);
+});
 
 
 
@@ -259,7 +280,16 @@ app.get('/', (req, res) => {
             if (req.query.search != null){
                 jsonData = jsonData.filter(item => item.name.toLowerCase().includes(req.query.search));
                 searchParam = req.query.search;
-                }
+            }
+
+            let filter = "";
+            if (req.query.filter != null){
+                jsonData = jsonData.filter(item => item.level == req.query.filter);
+                filter = req.query.filter;
+            }
+
+            // Generate dropdown HTML
+            const dropdownHTML = generateDropdownHTML();
 
             // Calculate pagination parameters
             const pageSize = 10; // Number of exercises per page
@@ -292,28 +322,47 @@ app.get('/', (req, res) => {
 
             // Generate page counter links
             const pageLinks = Array.from({ length: totalPages }, (_, index) => index + 1)
-                .map(page => `<a href="/?search=${searchParam}&page=${page}"${page === currentPage ? ' class="active"' : ''}>${page}</a>`)
+                .map(page => `<a href="/?filter=${filter}&search=${searchParam}&page=${page}"${page === currentPage ? ' class="active"' : ''}>${page}</a>`)
                 .join(' | ');
 
             // Send the list of exercises for the current page as response
             res.send(`
-            Welcome
-            <form action=/createUser method=get> 
-                <button type=submit>Sign Up</button> 
-            </form>
-            <form action="/login" method="get">
-                <button type="submit">Login</button>
-            </form>
-            <form action="/search" method="post">
-            <input name="search" id="searchbar" class="form-control me-2"
-                type="search" placeholder="Search" aria-label="Search">
-                <button>Submit</button>
-            </form>
-            <h1>List of Exercises</h1>
-            <ul>${exercisesHTML}</ul>
-            <div>
-                Pages: ${pageLinks}
-            </div>
+            <!DOCTYPE html>
+            <html lang="en">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>List of Exercises</title>
+                ${bootstrapCDN} <!-- Include Bootstrap CSS -->
+            </head>
+            <body>
+                Welcome
+                <form action="/createUser" method="get"> 
+                    <button type="submit">Sign Up</button> 
+                </form>
+                <form action="/login" method="get">
+                    <button type="submit">Login</button>
+                </form>
+                <form action="/search" method="post">
+                    <div class="form-group">
+                        ${dropdownHTML} <!-- Bootstrap dropdown -->
+                    </div>
+                    <div class="form-group">
+                        <input name="search" id="searchbar" class="form-control me-2"
+                            type="search" placeholder="Search" aria-label="Search" value="${searchParam}">
+                        <button class="btn btn-primary">Submit</button>
+                    </div>
+                </form>
+                <h1>List of Exercises</h1>
+                <ul>${exercisesHTML}</ul>
+                <div>
+                    Pages: ${pageLinks}
+                </div>
+                <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+                <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.6/dist/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
+                <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.2.1/dist/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
+            </body>
+            </html>
             `);
         });
     } catch (error) {
