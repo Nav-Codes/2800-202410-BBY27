@@ -225,7 +225,7 @@ app.get('/loggedin', async (req, res) => {
     }
 });
 
-app.get('/:id', (req, res) => {
+app.get('/exercise/:id', (req, res) => {
     try {
         // Read the JSON file
         fs.readFile("./dist/exercises.json", 'utf8', (err, data) => {
@@ -240,21 +240,17 @@ app.get('/:id', (req, res) => {
 
             const filteredExercises = jsonData.filter(item => item.id === req.params.id);
 
+            var exercisesHTML;
             if (filteredExercises == "") {
-                console.log("404");
-                res.status(404);
-                res.send("Page not found - 404");
-                return;
-            }
-
-            // Generate HTML for each exercise
-            const exercisesHTML = filteredExercises.map(exercise => `
+                exercisesHTML = "<h3>Exercise not found</h3>";
+            } else {
+            exercisesHTML = filteredExercises.map(exercise => `
             <h3>${exercise.name}</h3>
-            <img src="./exercises/${exercise.images[0]}" alt="${exercise.name}">
+            <img src="/exercises/${exercise.images[0]}" alt="${exercise.name}">
             <p>level: ${exercise.level}, equipment: ${exercise.equipment}</p>
             <p>muscles: ${exercise.primaryMuscles}</p>
             <p>${exercise.instructions}</p>
-        `).join('');
+        `).join('');}
 
             // Send the list of exercises as response
             res.send(`
@@ -289,10 +285,9 @@ app.get('/', (req, res) => {
                 searchParam = req.query.search;
             }
 
-            let filter = "";
-            if (req.query.filter != ""){
+            let filter = req.query.filter || "";
+            if (filter){
                 jsonData = jsonData.filter(item => item.level == req.query.filter);
-                filter = req.query.filter;
             }
 
             // Generate dropdown HTML
@@ -319,7 +314,7 @@ app.get('/', (req, res) => {
             // Generate HTML for each exercise on the current page
             const exercisesHTML = exercisesInfo.map(exercise => `
                 <li id="${exercise.name}">
-                    <a href="${exercise.id}">
+                    <a href="/exercise/${exercise.id}">
                         <h3>${exercise.name}</h3>
                         <img src="./exercises/${exercise.images[0]}" alt="${exercise.name}">
                         <p>${exercise.instructions}</p>
