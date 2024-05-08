@@ -283,7 +283,7 @@ app.get('/', (req, res) => {
             }
 
             let filter = "";
-            if (req.query.filter != null){
+            if (req.query.filter != ""){
                 jsonData = jsonData.filter(item => item.level == req.query.filter);
                 filter = req.query.filter;
             }
