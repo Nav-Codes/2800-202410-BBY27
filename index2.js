@@ -11,11 +11,10 @@ app.use(express.urlencoded({extended: false}));
 // Serve static files from the dist/exercises directory
 app.use('/exercises', express.static(path.join('exercises')));
 
+app.set('view engine', 'ejs');
+
 //port
 const port = process.env.PORT || 3000;
-
-const bootstrapCDN = `<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">`;
-
 
 require('dotenv').config();
 
@@ -59,26 +58,9 @@ app.use(session({
 }
 ));
 
-function generateDropdownHTML() {
-    return `
-        <div class="dropdown">
-            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                Difficulty
-            </button>
-            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                <a class="dropdown-item" href="/filtering/beginner">Beginner</a>
-                <a class="dropdown-item" href="/filtering/intermediate">Intermediate</a>
-                <a class="dropdown-item" href="/filtering/expert">Expert</a>
-            </div>
-        </div>
-    `;
-}
-
 app.get('/filtering/:filter', (req,res) => {
     res.redirect('/?filter=' + req.params.filter);
 });
-
-
 
 app.get('/createUser', (req,res) => {
     var html = `
@@ -204,7 +186,7 @@ app.get('/loggedin', async (req, res) => {
             // If user found, display the logged-in message along with the user's name
             req.session.name = user.name;
 
-            var html = `
+            let html = `
                 Welcome ${user.name}!
                 <form action="/member" method="get">
                     <button type="submit">Member</button>
@@ -240,22 +222,8 @@ app.get('/exercise/:id', (req, res) => {
 
             const filteredExercises = jsonData.filter(item => item.id === req.params.id);
 
-            var exercisesHTML;
-            if (filteredExercises == "") {
-                exercisesHTML = "<h3>Exercise not found</h3>";
-            } else {
-            exercisesHTML = filteredExercises.map(exercise => `
-            <h3>${exercise.name}</h3>
-            <img src="/exercises/${exercise.images[0]}" alt="${exercise.name}">
-            <p>level: ${exercise.level}, equipment: ${exercise.equipment}</p>
-            <p>muscles: ${exercise.primaryMuscles}</p>
-            <p>${exercise.instructions}</p>
-        `).join('');}
-
             // Send the list of exercises as response
-            res.send(`
-            <ul>${exercisesHTML}</ul>
-        `);
+            res.render('exercise', {filteredExercises});
         });
     } catch (error) {
         // Handle error
@@ -290,9 +258,6 @@ app.get('/', (req, res) => {
                 jsonData = jsonData.filter(item => item.level == req.query.filter);
             }
 
-            // Generate dropdown HTML
-            const dropdownHTML = generateDropdownHTML();
-
             // Calculate pagination parameters
             const pageSize = 10; // Number of exercises per page
             const totalPages = Math.ceil(jsonData.length / pageSize);
@@ -311,61 +276,13 @@ app.get('/', (req, res) => {
                 id: item.id
             }));
 
-            // Generate HTML for each exercise on the current page
-            const exercisesHTML = exercisesInfo.map(exercise => `
-                <li id="${exercise.name}">
-                    <a href="/exercise/${exercise.id}">
-                        <h3>${exercise.name}</h3>
-                        <img src="./exercises/${exercise.images[0]}" alt="${exercise.name}">
-                        <p>${exercise.instructions}</p>
-                    </a>
-                </li>
-            `).join('');
-
             // Generate page counter links
             const pageLinks = Array.from({ length: totalPages }, (_, index) => index + 1)
                 .map(page => `<a href="/?filter=${filter}&search=${searchParam}&page=${page}"${page === currentPage ? ' class="active"' : ''}>${page}</a>`)
                 .join(' | ');
 
             // Send the list of exercises for the current page as response
-            res.send(`
-            <!DOCTYPE html>
-            <html lang="en">
-            <head>
-                <meta charset="UTF-8">
-                <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <title>List of Exercises</title>
-                ${bootstrapCDN} <!-- Include Bootstrap CSS -->
-            </head>
-            <body>
-                Welcome
-                <form action="/createUser" method="get"> 
-                    <button type="submit">Sign Up</button> 
-                </form>
-                <form action="/login" method="get">
-                    <button type="submit">Login</button>
-                </form>
-                <form action="/search" method="post">
-                    <div class="form-group">
-                        ${dropdownHTML} <!-- Bootstrap dropdown -->
-                    </div>
-                    <div class="form-group">
-                        <input name="search" id="searchbar" class="form-control me-2"
-                            type="search" placeholder="Search" aria-label="Search" value="${searchParam}">
-                        <button class="btn btn-primary">Submit</button>
-                    </div>
-                </form>
-                <h1>List of Exercises</h1>
-                <ul>${exercisesHTML}</ul>
-                <div>
-                    Pages: ${pageLinks}
-                </div>
-                <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-                <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.6/dist/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
-                <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.2.1/dist/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
-            </body>
-            </html>
-            `);
+            res.render('exerciselist', {searchParam, exercisesInfo, pageLinks});
         });
     } catch (error) {
         // Handle error
@@ -375,7 +292,7 @@ app.get('/', (req, res) => {
 });
 
 app.post('/search', async (req, res) => {
-    var search = req.body.search;
+    let search = req.body.search;
     res.redirect("/?search=" + search);
 });
  
