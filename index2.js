@@ -16,9 +16,6 @@ app.set('view engine', 'ejs');
 //port
 const port = process.env.PORT || 3000;
 
-const bootstrapCDN = `<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">`;
-
-
 require('dotenv').config();
 
 //main mongo connector
@@ -189,7 +186,7 @@ app.get('/loggedin', async (req, res) => {
             // If user found, display the logged-in message along with the user's name
             req.session.name = user.name;
 
-            var html = `
+            let html = `
                 Welcome ${user.name}!
                 <form action="/member" method="get">
                     <button type="submit">Member</button>
@@ -225,22 +222,8 @@ app.get('/exercise/:id', (req, res) => {
 
             const filteredExercises = jsonData.filter(item => item.id === req.params.id);
 
-            var exercisesHTML;
-            if (filteredExercises == "") {
-                exercisesHTML = "<h3>Exercise not found</h3>";
-            } else {
-            exercisesHTML = filteredExercises.map(exercise => `
-            <h3>${exercise.name}</h3>
-            <img src="/exercises/${exercise.images[0]}" alt="${exercise.name}">
-            <p>level: ${exercise.level}, equipment: ${exercise.equipment}</p>
-            <p>muscles: ${exercise.primaryMuscles}</p>
-            <p>${exercise.instructions}</p>
-        `).join('');}
-
             // Send the list of exercises as response
-            res.send(`
-            <ul>${exercisesHTML}</ul>
-        `);
+            res.render('exercise', {filteredExercises});
         });
     } catch (error) {
         // Handle error
@@ -293,17 +276,6 @@ app.get('/', (req, res) => {
                 id: item.id
             }));
 
-            // Generate HTML for each exercise on the current page
-            const exercisesHTML = exercisesInfo.map(exercise => `
-                <li id="${exercise.name}">
-                    <a href="/exercise/${exercise.id}">
-                        <h3>${exercise.name}</h3>
-                        <img src="./exercises/${exercise.images[0]}" alt="${exercise.name}">
-                        <p>${exercise.instructions}</p>
-                    </a>
-                </li>
-            `).join('');
-
             // Generate page counter links
             const pageLinks = Array.from({ length: totalPages }, (_, index) => index + 1)
                 .map(page => `<a href="/?filter=${filter}&search=${searchParam}&page=${page}"${page === currentPage ? ' class="active"' : ''}>${page}</a>`)
@@ -320,7 +292,7 @@ app.get('/', (req, res) => {
 });
 
 app.post('/search', async (req, res) => {
-    var search = req.body.search;
+    let search = req.body.search;
     res.redirect("/?search=" + search);
 });
  
