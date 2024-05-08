@@ -240,6 +240,13 @@ app.get('/:id', (req, res) => {
 
             const filteredExercises = jsonData.filter(item => item.id === req.params.id);
 
+            if (filteredExercises == "") {
+                console.log("404");
+                res.status(404);
+                res.send("Page not found - 404");
+                return;
+            }
+
             // Generate HTML for each exercise
             const exercisesHTML = filteredExercises.map(exercise => `
             <h3>${exercise.name}</h3>
@@ -379,6 +386,7 @@ app.post('/search', async (req, res) => {
  
 
 app.get("*", (req, res) => {
+    console.log("404");
     res.status(404);
     res.send("Page not found - 404");
 }) 
