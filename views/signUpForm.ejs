@@ -1,8 +1,11 @@
 <%- include("templates/header") %> 
+
 <% if(duplicate === 1) { %>
-<%- include("templates/duplicateAccount") %>
+
 <% }  %>
+
 // bootstrap form field
+
 <form action="/submitUser" method="post">
   <div class="form-group">
     <label>Username</label>
@@ -12,7 +15,7 @@
     <div class="form-group">
       <label for="exampleInputEmail1">Email address</label>
       <input name="email " type="email" class="form-control" 
-      id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter email">
+      id="exampleInputEmail1"  placeholder="Enter email">
     </div>
     <div class="form-group">
       <label for="exampleInputPassword1">Password</label>
@@ -20,4 +23,5 @@
       class="form-control" id="exampleInputPassword1" placeholder="Password">
     </div>
 </form>
+
 <%- include("templates/footer") %>

@@ -22,18 +22,18 @@ require('dotenv').config();
 const MongoStore = require('connect-mongo');
 const saltRounds = 12;
 
-const expireTime = 3600;
+const expireTime = 3600 * 60;
 
 //crypt const
 const bcrypt = require('bcrypt');
 
 const Joi = require("joi");
+const { error } = require("console");
 
 var {database} = include('databaseConnection.js');
 const userCollection = database.db(process.env.MONGODB_DATABASE).collection(process.env.MONGODB_COLLECTION);
 
 
-app.set('view engine', 'ejs');
 
 /* secret information section */
 const mongodb_host = process.env.MONGODB_HOST;
@@ -44,6 +44,7 @@ const mongodb_session_secret = process.env.MONGODB_SESSION_SECRET;
 
 const node_session_secret = process.env.NODE_SESSION_SECRET;
 /* END secret section */
+
 
 var mongoStore = MongoStore.create({
     mongoUrl: `mongodb+srv://${mongodb_user}:${mongodb_password}@${mongodb_host}/sessions`,
@@ -60,17 +61,11 @@ app.use(session({
 }
 ));
 
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
+
 app.get('/createUser', (req,res) => {
-    var html = `
-    Sign Up
-    <form action='/submitUser' method='post'>
-    <input name='name' type='text' placeholder='name'>
-    <input name='email' type='email' placeholder='email'>
-    <input name='password' type='password' placeholder='password'>
-    <button>Submit</button>
-    </form>
-    `;
-    res.send(html);
+    res.render("signUpForm");
 });
 
 
@@ -119,20 +114,14 @@ app.post('/submitUser', async (req,res) => {
     res.send(html);
     }
     else {
-        res.redirect('/createUser')
+        const uses = {duplicate: 1};
+        res.render("signUpForm", {uses: uses});
     }
 });
 
+
 app.get('/login', (req,res) => {
-    var html = `
-    log in
-    <form action='/loggingin' method='post'>
-    <input name='email' type='email' placeholder='email'>
-    <input name='password' type='password' placeholder='password'>
-    <button>Submit</button>
-    </form>
-    `;
-    res.send(html);
+    res.render("loginForm", { error: { userNoExist: 0, EmailNotEnt: 0, Wrong: 0 }});
 });
 
 app.post('/loggingin', async (req,res) => {
@@ -141,20 +130,25 @@ app.post('/loggingin', async (req,res) => {
 
 	const schema = Joi.string().email().required();
 	const validationResult = schema.validate(email);
+    
+
+
 	if (validationResult.error != null) {
-	   console.log(validationResult.error);
-	   res.redirect("/login");
-	   return;
+        res.render("loginForm", { error: { userNoExist: 0, EmailNotEnt: 1, Wrong: 0 } });
+
+        return;
 	}
+
+
 
 	const result = await userCollection.find({email: email}).project({email: 1, password: 1, name: 1, _id: 1}).toArray();
 
 	console.log(result);
 	if (result.length != 1) {
-		console.log("user not found");
-		res.redirect("/login");
+        res.render("loginForm", { error: { userNoExist: 1, EmailNotEnt: 0, Wrong: 0 } });
 		return;
 	}
+
     
     const user = result[0];
 
@@ -165,13 +159,14 @@ app.post('/loggingin', async (req,res) => {
         req.session.name = user.name;
 		req.session.cookie.maxAge = expireTime;
 
+        
+        app.locals.wrong = 0;
+
 		res.redirect('/loggedIn');
 		return;
 	}
 	else {
-		console.log("incorrect password");
-		res.redirect("/login");
-		return;
+        res.render("loginForm", { error: { userNoExist: 0, EmailNotEnt: 0, Wrong: 1 } });
 	}
 });
 
