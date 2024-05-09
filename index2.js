@@ -58,6 +58,8 @@ app.use(session({
 }
 ));
 
+app.set('view engine', 'ejs');
+
 app.get('/filtering/:filter', (req,res) => {
     res.redirect('/?filter=' + req.params.filter);
 });
@@ -205,6 +207,38 @@ app.get('/loggedin', async (req, res) => {
         console.error('Error fetching user:', error);
         res.status(500).send('Internal Server Error');
     }
+});
+
+app.get('/profile', (req, res) => {
+    res.render('userProfile');
+});
+
+app.get('/editProfile', (req, res) => {
+    res.render('editProfile');
+});
+
+app.get('/schedule', (req, res) => {
+    res.render('schedule');
+});
+
+app.get('/goals', (req, res) => {
+    res.render('goals');
+});
+
+app.get('/profile', (req, res) => {
+    res.render('userProfile');
+});
+
+app.get('/editProfile', (req, res) => {
+    res.render('editProfile');
+});
+
+app.get('/schedule', (req, res) => {
+    res.render('schedule');
+});
+
+app.get('/goals', (req, res) => {
+    res.render('goals');
 });
 
 app.get('/exercise/:id', (req, res) => {
