@@ -221,8 +221,41 @@ app.get('/editProfile', (req, res) => {
     res.render('editProfile');
 });
 
+const workouts = {
+    work : [
+        {
+            date: 'sunday',
+            workoutList: ['rest']
+        },
+        {
+            date: 'monday',
+            workoutList: ['push-ups', 'pull-ups', 'bicep curls']
+        },
+        {
+            date: 'tuesday',
+            workoutList: ['lunges', 'squats']
+        },
+        {
+            date: 'wednesday',
+            workoutList: ['rest']
+        },
+        {
+            date: 'thursday',
+            workoutList: ['lat pull down', 'bench press']
+        },
+        {
+            date: 'friday',
+            workoutList: ['tricep extensions', 'push ups']
+        },
+        {
+            date: 'saturday',
+            workoutList: ['active rest']
+        },
+    ]
+};
+
 app.get('/schedule', (req, res) => {
-    res.render('schedule');
+    res.render('schedule', {workouts});
 });
 
 app.get('/goals', (req, res) => {
