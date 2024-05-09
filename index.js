@@ -110,22 +110,38 @@ app.post('/submitUser', async (req,res) => {
 
     const result = await userCollection.find({email: email}).project({email: 1, password: 1, name: 1, _id: 1}).toArray();
 
-    if(!(result[0].email === email || result[0].name === name)){
-	await userCollection.insertOne({email: email, password: hashedPassword, name: name});
-	console.log("Inserted user");
-
-    // Set user details in the session
-    req.session.authenticated = true;
-    req.session.email = email;
-    req.session.name = name;
-    req.session.cookie.maxAge = expireTime;
-
-    //temp redirect till homepage complete.
-    res.redirect("/");
-    }
-    else {
-        res.render("signUpForm", {duplicate: 1, InvalidField: 0});
-    }
+    if (!result || result.length === 0) {
+        // No user found with the given email
+        await userCollection.insertOne({ email: email, password: hashedPassword, name: name });
+        console.log("Inserted user");
+    
+        // Set user details in the session
+        req.session.authenticated = true;
+        req.session.email = email;
+        req.session.name = name;
+        req.session.cookie.maxAge = expireTime;
+    
+        //temp redirect till homepage complete.
+        res.redirect("/");
+    } else {
+        // Check for duplicate email or name
+        const existingUser = result.find(user => user.email === email || user.name === name);
+        if (existingUser) {
+            res.render("signUpForm", { duplicate: 1, InvalidField: 0 });
+        } else {
+            // No duplicate found, insert new user
+            await userCollection.insertOne({ email: email, password: hashedPassword, name: name });
+            console.log("Inserted user");
+    
+            // Set user details in the session
+            req.session.authenticated = true;
+            req.session.email = email;
+            req.session.name = name;
+            req.session.cookie.maxAge = expireTime;
+    
+            //temp redirect till homepage complete.
+            res.redirect("/");
+        }}
 });
 
 
