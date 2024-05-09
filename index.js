@@ -1,5 +1,3 @@
-require("./utils.js");
-
 //express constants
 require("./utils.js");
 
@@ -15,12 +13,6 @@ app.use(express.urlencoded({extended: false}));
 app.use('/exercises', express.static(path.join('exercises')));
 
 app.set('view engine', 'ejs');
-
-//port
-const session = require('express-session');
-const fs = require('fs');
-const path = require('path');
-app.use(express.urlencoded({extended: false}));
 
 // Serve static files from the dist/exercises directory
 app.use('/exercises', express.static(path.join('exercises')));
@@ -39,6 +31,7 @@ const saltRounds = 12;
 const expireTime = 3600;
 
 //openai
+const openai_api_key = process.env.OPENAI_API_KEY; 
 const { OpenAI } = require('openai');
 const openai = new OpenAI(openai_api_key);
 
@@ -59,7 +52,6 @@ const mongodb_database = process.env.MONGODB_DATABASE;
 const mongodb_session_secret = process.env.MONGODB_SESSION_SECRET;
 
 const node_session_secret = process.env.NODE_SESSION_SECRET;
-const openai_api_key = process.env.OPENAI_API_KEY; 
 /* END secret section */
 
 var mongoStore = MongoStore.create({
