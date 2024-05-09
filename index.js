@@ -65,7 +65,7 @@ app.get('/filtering/:filter', (req,res) => {
 });
 
 app.get('/createUser', (req,res) => {
-    res.render("signUpForm");
+    res.render("signUpForm", {duplicate: 0, InvalidField: 0});
 });
 
 
@@ -84,7 +84,7 @@ app.post('/submitUser', async (req,res) => {
 	const validationResult = schema.validate({email, password, name});
 	if (validationResult.error != null) {
 	   console.log(validationResult.error);
-	   res.redirect("/createUser");
+	   res.render("signUpForm",{duplicate: 0, InvalidField: 1})
 	   return;
    }
 
@@ -102,20 +102,11 @@ app.post('/submitUser', async (req,res) => {
     req.session.name = name;
     req.session.cookie.maxAge = expireTime;
 
-    var html = `
-    Successfully Created User
-    <form action="/member" method="get">
-    <button type="submit">Member</button>
-    </form>
-    <form action="/logout" method="get">
-    <button type="submit">LogOut</button>
-    </form>
-    `;
-    res.send(html);
+    //temp redirect till homepage complete.
+    res.redirect("/");
     }
     else {
-        const uses = {duplicate: 1};
-        res.render("signUpForm", {uses: uses});
+        res.render("signUpForm", {duplicate: 1, InvalidField: 0});
     }
 });
 
@@ -159,6 +150,7 @@ app.post('/loggingin', async (req,res) => {
         req.session.name = user.name;
 		req.session.cookie.maxAge = expireTime;
 
+       
 		res.redirect('/loggedIn');
 		return;
 	}
@@ -182,17 +174,9 @@ app.get('/loggedin', async (req, res) => {
         if (user) {
             // If user found, display the logged-in message along with the user's name
             req.session.name = user.name;
-
-            var html = `
-                Welcome ${user.name}!
-                <form action="/member" method="get">
-                    <button type="submit">Member</button>
-                </form>
-                <form action="/logout" method="get">
-                    <button type="submit">Log Out</button>
-                </form>
-            `;
-            res.send(html);
+            
+            //temp redirect till homepage complete.
+            res.redirect("/")
         } else {
             // If user not found, log out the user
             req.session.destroy();
