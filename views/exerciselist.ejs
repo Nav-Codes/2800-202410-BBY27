@@ -25,14 +25,16 @@ Welcome
             <button class="btn btn-primary">Submit</button>
         </div>
     </form>
-    <h1>List of Exercises</h1>
+    <h1>Exercises:</h1>
     <ul>
         <% exercisesInfo.forEach(exercise => { %>
             <li id="<%= exercise.name %>">
                 <a href="/exercise/<%= exercise.id %>">
+                    <div>
                     <h3><%= exercise.name %></h3>
                     <img src="./exercises/<%= exercise.images[0] %>" alt="<%= exercise.name %>">
-                    <p><%= exercise.instructions %></p>
+                    <p>Muscle: <%= exercise.primaryMuscles[0].charAt(0).toUpperCase() + exercise.primaryMuscles[0].slice(1) %> </br> Difficulty: <%=exercise.level.charAt(0).toUpperCase() + exercise.level.slice(1) %></p>
+                    </div>
                 </a>
             </li>
         <% }); %>

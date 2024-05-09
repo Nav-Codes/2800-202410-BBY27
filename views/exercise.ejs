@@ -4,13 +4,18 @@
     <% exercisesHTML += "<h3>Exercise not found</h3>"; %>
 <% } else { %>
     <% exercisesHTML += filteredExercises.map(exercise => { %>
-        <h3><%= exercise.name %></h3>
+        <h3><%= exercise.name.charAt(0).toUpperCase() + exercise.name.slice(1) %></h3>
         <img src="/exercises/<%= exercise.images[0] %>" alt="<%= exercise.name %>">
-        <p>level: <%= exercise.level %>, equipment: <%= exercise.equipment %></p>
-        <p>muscles: <%= exercise.primaryMuscles %></p>
+        <p>Difficulty: <%= exercise.level.charAt(0).toUpperCase() + exercise.level.slice(1) %>, Equipment: <%= exercise.equipment.charAt(0).toUpperCase() + exercise.equipment.slice(1) %></p>
+        <p>Primary Muscles: <%= exercise.primaryMuscles[0].charAt(0).toUpperCase() + exercise.primaryMuscles[0].slice(1) %>
+            <% if (exercise.secondaryMuscles[0] != null) { %>
+            , Accessory Muscles: <%= exercise.secondaryMuscles.map(muscle => muscle.charAt(0).toUpperCase() + muscle.slice(1)).join(', ') %>
+            <% } %>
+        </p>
         <p><%= exercise.instructions %></p>
     <% }).join(''); %>
 <% } %>
 <% exercisesHTML += '</ul>'; %>
 <%- exercisesHTML %>
 <%- include('./templates/footer'); %>
+
