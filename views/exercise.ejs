@@ -1,0 +1,16 @@
+<%- include('./templates/header'); %>
+<% let exercisesHTML = '<ul>'; %>
+<% if (filteredExercises == "") { %>
+    <% exercisesHTML += "<h3>Exercise not found</h3>"; %>
+<% } else { %>
+    <% exercisesHTML += filteredExercises.map(exercise => { %>
+        <h3><%= exercise.name %></h3>
+        <img src="/exercises/<%= exercise.images[0] %>" alt="<%= exercise.name %>">
+        <p>level: <%= exercise.level %>, equipment: <%= exercise.equipment %></p>
+        <p>muscles: <%= exercise.primaryMuscles %></p>
+        <p><%= exercise.instructions %></p>
+    <% }).join(''); %>
+<% } %>
+<% exercisesHTML += '</ul>'; %>
+<%- exercisesHTML %>
+<%- include('./templates/footer'); %>

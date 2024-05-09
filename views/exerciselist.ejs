@@ -1,0 +1,43 @@
+<%- include('./templates/header'); %>
+Welcome
+    <form action="/createUser" method="get"> 
+        <button type="submit">Sign Up</button> 
+    </form>
+    <form action="/login" method="get">
+        <button type="submit">Login</button>
+    </form>
+    <form action="/search" method="post">
+        <div class="form-group">
+            <div class="dropdown">
+                <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Difficulty
+                </button>
+                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                    <a class="dropdown-item" href="/filtering/beginner">Beginner</a>
+                    <a class="dropdown-item" href="/filtering/intermediate">Intermediate</a>
+                    <a class="dropdown-item" href="/filtering/expert">Expert</a>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <input name="search" id="searchbar" class="form-control me-2"
+                type="search" placeholder="Search" aria-label="Search" value="<%= searchParam %>">
+            <button class="btn btn-primary">Submit</button>
+        </div>
+    </form>
+    <h1>List of Exercises</h1>
+    <ul>
+        <% exercisesInfo.forEach(exercise => { %>
+            <li id="<%= exercise.name %>">
+                <a href="/exercise/<%= exercise.id %>">
+                    <h3><%= exercise.name %></h3>
+                    <img src="./exercises/<%= exercise.images[0] %>" alt="<%= exercise.name %>">
+                    <p><%= exercise.instructions %></p>
+                </a>
+            </li>
+        <% }); %>
+    </ul>
+    <div>
+        Pages: <%- pageLinks %>
+    </div>
+    <%- include('./templates/footer'); %>

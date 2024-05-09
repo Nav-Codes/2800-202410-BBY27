@@ -1,0 +1,51 @@
+<%-include('templates/header');%>
+    <!-- replace carousel with for loop that goes through all items in schedule 
+    loop would run 7 times, setting title to Monday, Tuesday, etc. and would 
+    get workout info from mongodb and paste it inside the right date-->
+
+    <head>
+        <style>
+            /* Custom CSS for horizontal scrolling */
+            .scrolling-wrapper {
+                overflow-x: auto;
+                white-space: nowrap;
+            }
+            .card {
+                display: inline-block;
+                width: 300px;
+                /* Adjust as needed */
+                margin-right: 10px;
+                /* Adjust as needed */
+            }
+        </style>
+    </head>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col">
+                <h1>Horizontally Scrolling Page</h1>
+                <div class="scrolling-wrapper">
+                    <!-- Cards -->
+                    <div class="card">
+                        <img src="https://via.placeholder.com/300" class="card-img-top" alt="Card image">
+                        <div class="card-body">
+                            <h5 class="card-title">Monday</h5>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <img src="https://via.placeholder.com/300" class="card-img-top" alt="Card image">
+                        <div class="card-body">
+                            <h5 class="card-title">Tuesday</h5>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <img src="https://via.placeholder.com/300" class="card-img-top" alt="Card image">
+                        <div class="card-body">
+                            <h5 class="card-title">Wednesday</h5>
+                        </div>
+                    </div>
+                    <!-- Add more cards here -->
+                </div>
+            </div>
+        </div>
+    </div>
+    <%-include('templates/footer');%>
