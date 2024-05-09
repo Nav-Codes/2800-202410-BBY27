@@ -24,6 +24,10 @@ const saltRounds = 12;
 
 const expireTime = 3600;
 
+//openai
+const { OpenAI } = require('openai');
+const openai = new OpenAI(openai_api_key);
+
 //crypt const
 const bcrypt = require('bcrypt');
 
@@ -41,6 +45,7 @@ const mongodb_database = process.env.MONGODB_DATABASE;
 const mongodb_session_secret = process.env.MONGODB_SESSION_SECRET;
 
 const node_session_secret = process.env.NODE_SESSION_SECRET;
+const openai_api_key = process.env.OPENAI_API_KEY; 
 /* END secret section */
 
 var mongoStore = MongoStore.create({
@@ -308,8 +313,16 @@ app.post('/search', async (req, res) => {
     let search = req.body.search;
     res.redirect("/?search=" + search);
 });
- 
 
+app.get('/ai', async (req,res) =>{
+    const response = await openai.chat.completions.create({
+        model: 'gpt-3.5-turbo',
+        messages: [{"role":"user", "content":"Give me a poem?"}],
+        max_tokens: 60
+    })
+    res.json({ message: response['choices'][0]['message']['content'].trim() });
+})
+ 
 app.get("*", (req, res) => {
     console.log("404");
     res.status(404);
