@@ -65,16 +65,7 @@ app.get('/filtering/:filter', (req,res) => {
 });
 
 app.get('/createUser', (req,res) => {
-    var html = `
-    Sign Up
-    <form action='/submitUser' method='post'>
-    <input name='name' type='text' placeholder='name'>
-    <input name='email' type='email' placeholder='email'>
-    <input name='password' type='password' placeholder='password'>
-    <button>Submit</button>
-    </form>
-    `;
-    res.send(html);
+    res.render("signUpForm");
 });
 
 
@@ -98,7 +89,10 @@ app.post('/submitUser', async (req,res) => {
    }
 
     var hashedPassword = await bcrypt.hash(password, saltRounds);
-	
+
+    const result = await userCollection.find({email: email}).project({email: 1, password: 1, name: 1, _id: 1}).toArray();
+
+    if(!(result[0].email === email || result[0].name === name)){
 	await userCollection.insertOne({email: email, password: hashedPassword, name: name});
 	console.log("Inserted user");
 
@@ -118,40 +112,43 @@ app.post('/submitUser', async (req,res) => {
     </form>
     `;
     res.send(html);
+    }
+    else {
+        const uses = {duplicate: 1};
+        res.render("signUpForm", {uses: uses});
+    }
 });
 
+
 app.get('/login', (req,res) => {
-    var html = `
-    log in
-    <form action='/loggingin' method='post'>
-    <input name='email' type='email' placeholder='email'>
-    <input name='password' type='password' placeholder='password'>
-    <button>Submit</button>
-    </form>
-    `;
-    res.send(html);
+    res.render("loginForm", { error: { userNoExist: 0, EmailNotEnt: 0, Wrong: 0 }});
 });
- 
+
 app.post('/loggingin', async (req,res) => {
     var email = req.body.email;
     var password = req.body.password;
 
 	const schema = Joi.string().email().required();
 	const validationResult = schema.validate(email);
+    
+
+
 	if (validationResult.error != null) {
-	   console.log(validationResult.error);
-	   res.redirect("/login");
-	   return;
+        res.render("loginForm", { error: { userNoExist: 0, EmailNotEnt: 1, Wrong: 0 } });
+
+        return;
 	}
+
+
 
 	const result = await userCollection.find({email: email}).project({email: 1, password: 1, name: 1, _id: 1}).toArray();
 
 	console.log(result);
 	if (result.length != 1) {
-		console.log("user not found");
-		res.redirect("/login");
+        res.render("loginForm", { error: { userNoExist: 1, EmailNotEnt: 0, Wrong: 0 } });
 		return;
 	}
+
     
     const user = result[0];
 
@@ -166,9 +163,7 @@ app.post('/loggingin', async (req,res) => {
 		return;
 	}
 	else {
-		console.log("incorrect password");
-		res.redirect("/login");
-		return;
+        res.render("loginForm", { error: { userNoExist: 0, EmailNotEnt: 0, Wrong: 1 } });
 	}
 });
 
@@ -188,7 +183,7 @@ app.get('/loggedin', async (req, res) => {
             // If user found, display the logged-in message along with the user's name
             req.session.name = user.name;
 
-            let html = `
+            var html = `
                 Welcome ${user.name}!
                 <form action="/member" method="get">
                     <button type="submit">Member</button>
