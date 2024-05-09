@@ -14,15 +14,15 @@
                             <p>
                                 <strong>Difficulty:</strong>
                                 <%= exercise.level.charAt(0).toUpperCase() + exercise.level.slice(1) %>
-                                <% if (exercise.equpment != null) { %>
-                                    , <strong>Equipment:</strong> <%= exercise.equipment.charAt(0).toUpperCase() + exercise.equipment.slice(1) %>
+                                <% if (exercise.equipment != null) { %>
+                                    <strong>Equipment:</strong> <%= exercise.equipment.charAt(0).toUpperCase() + exercise.equipment.slice(1) %>
                                 <% } %>
                             </p>
                             <p>
                                 <strong>Primary Muscles:</strong>
                                 <%= exercise.primaryMuscles[0].charAt(0).toUpperCase() + exercise.primaryMuscles[0].slice(1) %>
                                 <% if (exercise.secondaryMuscles[0] != null) { %>
-                                    , <strong>Accessory Muscles:</strong>
+                                    <strong>Accessory Muscles:</strong>
                                     <%= exercise.secondaryMuscles.map(muscle => muscle.charAt(0).toUpperCase() + muscle.slice(1)).join(', ') %>
                                 <% } %>
                             </p>
