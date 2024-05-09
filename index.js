@@ -38,13 +38,10 @@ const saltRounds = 12;
 
 const expireTime = 3600;
 
-<<<<<<< HEAD
 //openai
 const { OpenAI } = require('openai');
 const openai = new OpenAI(openai_api_key);
 
-=======
->>>>>>> ExerciseInfoUpdate
 //crypt const
 const bcrypt = require('bcrypt');
 
@@ -62,10 +59,7 @@ const mongodb_database = process.env.MONGODB_DATABASE;
 const mongodb_session_secret = process.env.MONGODB_SESSION_SECRET;
 
 const node_session_secret = process.env.NODE_SESSION_SECRET;
-<<<<<<< HEAD
 const openai_api_key = process.env.OPENAI_API_KEY; 
-=======
->>>>>>> ExerciseInfoUpdate
 /* END secret section */
 
 var mongoStore = MongoStore.create({
@@ -83,30 +77,12 @@ app.use(session({
 }
 ));
 
-<<<<<<< HEAD
-app.set('view engine', 'ejs');
-
-=======
->>>>>>> ExerciseInfoUpdate
 app.get('/filtering/:filter', (req,res) => {
     res.redirect('/?filter=' + req.params.filter);
 });
 
 app.get('/createUser', (req,res) => {
-<<<<<<< HEAD
     res.render("signUpForm");
-=======
-    var html = `
-    Sign Up
-    <form action='/submitUser' method='post'>
-    <input name='name' type='text' placeholder='name'>
-    <input name='email' type='email' placeholder='email'>
-    <input name='password' type='password' placeholder='password'>
-    <button>Submit</button>
-    </form>
-    `;
-    res.send(html);
->>>>>>> ExerciseInfoUpdate
 });
 
 
@@ -130,14 +106,10 @@ app.post('/submitUser', async (req,res) => {
    }
 
     var hashedPassword = await bcrypt.hash(password, saltRounds);
-<<<<<<< HEAD
 
     const result = await userCollection.find({email: email}).project({email: 1, password: 1, name: 1, _id: 1}).toArray();
 
     if(!(result[0].email === email || result[0].name === name)){
-=======
-	
->>>>>>> ExerciseInfoUpdate
 	await userCollection.insertOne({email: email, password: hashedPassword, name: name});
 	console.log("Inserted user");
 
@@ -157,7 +129,6 @@ app.post('/submitUser', async (req,res) => {
     </form>
     `;
     res.send(html);
-<<<<<<< HEAD
     }
     else {
         const uses = {duplicate: 1};
@@ -168,20 +139,6 @@ app.post('/submitUser', async (req,res) => {
 
 app.get('/login', (req,res) => {
     res.render("loginForm", { error: { userNoExist: 0, EmailNotEnt: 0, Wrong: 0 }});
-=======
-});
-
-app.get('/login', (req,res) => {
-    var html = `
-    log in
-    <form action='/loggingin' method='post'>
-    <input name='email' type='email' placeholder='email'>
-    <input name='password' type='password' placeholder='password'>
-    <button>Submit</button>
-    </form>
-    `;
-    res.send(html);
->>>>>>> ExerciseInfoUpdate
 });
 
 app.post('/loggingin', async (req,res) => {
@@ -190,7 +147,6 @@ app.post('/loggingin', async (req,res) => {
 
 	const schema = Joi.string().email().required();
 	const validationResult = schema.validate(email);
-<<<<<<< HEAD
     
 
 
@@ -202,29 +158,14 @@ app.post('/loggingin', async (req,res) => {
 
 
 
-=======
-	if (validationResult.error != null) {
-	   console.log(validationResult.error);
-	   res.redirect("/login");
-	   return;
-	}
-
->>>>>>> ExerciseInfoUpdate
 	const result = await userCollection.find({email: email}).project({email: 1, password: 1, name: 1, _id: 1}).toArray();
 
 	console.log(result);
 	if (result.length != 1) {
-<<<<<<< HEAD
         res.render("loginForm", { error: { userNoExist: 1, EmailNotEnt: 0, Wrong: 0 } });
 		return;
 	}
 
-=======
-		console.log("user not found");
-		res.redirect("/login");
-		return;
-	}
->>>>>>> ExerciseInfoUpdate
     
     const user = result[0];
 
@@ -239,13 +180,7 @@ app.post('/loggingin', async (req,res) => {
 		return;
 	}
 	else {
-<<<<<<< HEAD
         res.render("loginForm", { error: { userNoExist: 0, EmailNotEnt: 0, Wrong: 1 } });
-=======
-		console.log("incorrect password");
-		res.redirect("/login");
-		return;
->>>>>>> ExerciseInfoUpdate
 	}
 });
 
@@ -265,11 +200,7 @@ app.get('/loggedin', async (req, res) => {
             // If user found, display the logged-in message along with the user's name
             req.session.name = user.name;
 
-<<<<<<< HEAD
             var html = `
-=======
-            let html = `
->>>>>>> ExerciseInfoUpdate
                 Welcome ${user.name}!
                 <form action="/member" method="get">
                     <button type="submit">Member</button>
@@ -290,7 +221,6 @@ app.get('/loggedin', async (req, res) => {
     }
 });
 
-<<<<<<< HEAD
 app.get('/profile', (req, res) => {
     res.render('userProfile');
 });
@@ -307,8 +237,6 @@ app.get('/goals', (req, res) => {
     res.render('goals');
 });
 
-=======
->>>>>>> ExerciseInfoUpdate
 app.get('/exercise/:id', (req, res) => {
     try {
         // Read the JSON file
@@ -392,7 +320,6 @@ app.post('/search', async (req, res) => {
     let search = req.body.search;
     res.redirect("/?search=" + search);
 });
-<<<<<<< HEAD
 
 app.get('/ai', async (req,res) =>{
     const response = await openai.chat.completions.create({
@@ -403,10 +330,6 @@ app.get('/ai', async (req,res) =>{
     res.json({ message: response['choices'][0]['message']['content'].trim() });
 })
  
-=======
- 
-
->>>>>>> ExerciseInfoUpdate
 app.get("*", (req, res) => {
     console.log("404");
     res.status(404);
