@@ -269,12 +269,7 @@ app.get('/', (req, res) => {
             const endIndex = Math.min(startIndex + pageSize, jsonData.length);
 
             // Extract names, images, and descriptions from the JSON data for the current page
-            const exercisesInfo = jsonData.slice(startIndex, endIndex).map(item => ({
-                name: item.name,
-                images: item.images,
-                instructions: item.instructions,
-                id: item.id
-            }));
+            const exercisesInfo = jsonData.slice(startIndex, endIndex)
 
             // Generate page counter links
             const pageLinks = Array.from({ length: totalPages }, (_, index) => index + 1)

@@ -6,8 +6,12 @@
     <% exercisesHTML += filteredExercises.map(exercise => { %>
         <h3><%= exercise.name %></h3>
         <img src="/exercises/<%= exercise.images[0] %>" alt="<%= exercise.name %>">
-        <p>level: <%= exercise.level %>, equipment: <%= exercise.equipment %></p>
-        <p>muscles: <%= exercise.primaryMuscles %></p>
+        <p>Difficulty: <%= exercise.level %>, equipment: <%= exercise.equipment %></p>
+        <p>Primary Muscles: <%= exercise.primaryMuscles %> 
+            <% if (exercise.secondaryMuscles[0] != null) {%>
+            , Accessory Muscles: <%= exercise.secondaryMuscles%>
+            <% } %>
+        </p>
         <p><%= exercise.instructions %></p>
     <% }).join(''); %>
 <% } %>
