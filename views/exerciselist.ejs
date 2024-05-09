@@ -57,7 +57,7 @@
                     <div class="card">
                         <div class="card-body">
                             <h3 class="card-title"><%= exercise.name %></h3>
-                            <img src="./exercises/<%= exercise.images[0] %>" alt="<%= exercise.name %>" class="img-fluid mb-2">
+                            <img src="/exercises/<%= exercise.images[0] %>" alt="<%= exercise.name %>" class="img-fluid mb-2">
                             <p class="card-text">Muscles: <%= exercise.primaryMuscles[0].charAt(0).toUpperCase() + exercise.primaryMuscles[0].slice(1) %><br>Difficulty: <%=exercise.level.charAt(0).toUpperCase() + exercise.level.slice(1) %></p>
                         </div>
                     </div>

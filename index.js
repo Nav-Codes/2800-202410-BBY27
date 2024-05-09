@@ -79,7 +79,7 @@ app.use(session({
 ));
 
 app.get('/filtering/:filter', (req,res) => {
-    res.redirect('/?filter=' + req.params.filter);
+    res.redirect('/exercises/?filter=' + req.params.filter);
 });
 
 app.get('/createUser', (req,res) => {
@@ -249,7 +249,7 @@ app.get('/exercise/:id', (req, res) => {
 
 
 
-app.get('/', (req, res) => {
+app.get('/exercises', (req, res) => {
     try {
         // Read the JSON file
         fs.readFile("./dist/exercises.json", 'utf8', (err, data) => {
@@ -298,7 +298,7 @@ app.get('/', (req, res) => {
 
 app.post('/search', async (req, res) => {
     let search = req.body.search;
-    res.redirect("/?search=" + search);
+    res.redirect("/exercises/?search=" + search);
 });
 
 app.get('/ai', async (req,res) =>{
