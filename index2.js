@@ -328,6 +328,10 @@ app.post('/search', async (req, res) => {
     res.redirect("/?search=" + search);
 });
 
+app.get('/home', (req, res) => {
+    res.render("homepage.ejs");
+});
+
 
 app.get("*", (req, res) => {
     res.status(404);
