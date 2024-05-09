@@ -293,13 +293,8 @@ app.get('/', (req, res) => {
             // Extract names, images, and descriptions from the JSON data for the current page
             const exercisesInfo = jsonData.slice(startIndex, endIndex);
 
-            // Generate page counter links
-            const pageLinks = Array.from({ length: totalPages }, (_, index) => index + 1)
-                .map(page => `<a href="/?filter=${filter}&search=${searchParam}&page=${page}"${page === currentPage ? ' class="active"' : ''}>${page}</a>`)
-                .join(' | ');
-
             // Send the list of exercises for the current page as response
-            res.render('exerciselist', {searchParam, exercisesInfo, pageLinks});
+            res.render('exerciselist', {searchParam, exercisesInfo, currentPage, filter, totalPages});
         });
     } catch (error) {
         // Handle error
