@@ -11,10 +11,10 @@ app.use(express.urlencoded({extended: false}));
 // Serve static files from the dist/exercises directory
 app.use('/exercises', express.static(path.join('exercises')));
 
+app.set('view engine', 'ejs');
 
 //port
 const port = process.env.PORT || 3000;
-
 
 require('dotenv').config();
 
@@ -22,17 +22,15 @@ require('dotenv').config();
 const MongoStore = require('connect-mongo');
 const saltRounds = 12;
 
-const expireTime = 3600 * 60;
+const expireTime = 3600;
 
 //crypt const
 const bcrypt = require('bcrypt');
 
 const Joi = require("joi");
-const { error } = require("console");
 
 var {database} = include('databaseConnection.js');
 const userCollection = database.db(process.env.MONGODB_DATABASE).collection(process.env.MONGODB_COLLECTION);
-
 
 
 /* secret information section */
@@ -44,7 +42,6 @@ const mongodb_session_secret = process.env.MONGODB_SESSION_SECRET;
 
 const node_session_secret = process.env.NODE_SESSION_SECRET;
 /* END secret section */
-
 
 var mongoStore = MongoStore.create({
     mongoUrl: `mongodb+srv://${mongodb_user}:${mongodb_password}@${mongodb_host}/sessions`,
@@ -62,7 +59,10 @@ app.use(session({
 ));
 
 app.set('view engine', 'ejs');
-app.set('views', path.join(__dirname, 'views'));
+
+app.get('/filtering/:filter', (req,res) => {
+    res.redirect('/?filter=' + req.params.filter);
+});
 
 app.get('/createUser', (req,res) => {
     res.render("signUpForm");
@@ -159,9 +159,6 @@ app.post('/loggingin', async (req,res) => {
         req.session.name = user.name;
 		req.session.cookie.maxAge = expireTime;
 
-        
-        app.locals.wrong = 0;
-
 		res.redirect('/loggedIn');
 		return;
 	}
@@ -207,7 +204,39 @@ app.get('/loggedin', async (req, res) => {
     }
 });
 
-app.get('/:id', (req, res) => {
+app.get('/profile', (req, res) => {
+    res.render('userProfile');
+});
+
+app.get('/editProfile', (req, res) => {
+    res.render('editProfile');
+});
+
+app.get('/schedule', (req, res) => {
+    res.render('schedule');
+});
+
+app.get('/goals', (req, res) => {
+    res.render('goals');
+});
+
+app.get('/profile', (req, res) => {
+    res.render('userProfile');
+});
+
+app.get('/editProfile', (req, res) => {
+    res.render('editProfile');
+});
+
+app.get('/schedule', (req, res) => {
+    res.render('schedule');
+});
+
+app.get('/goals', (req, res) => {
+    res.render('goals');
+});
+
+app.get('/exercise/:id', (req, res) => {
     try {
         // Read the JSON file
         fs.readFile("./dist/exercises.json", 'utf8', (err, data) => {
@@ -222,19 +251,8 @@ app.get('/:id', (req, res) => {
 
             const filteredExercises = jsonData.filter(item => item.id === req.params.id);
 
-            // Generate HTML for each exercise
-            const exercisesHTML = filteredExercises.map(exercise => `
-            <h3>${exercise.name}</h3>
-            <img src="./exercises/${exercise.images[0]}" alt="${exercise.name}">
-            <p>level: ${exercise.level}, equipment: ${exercise.equipment}</p>
-            <p>muscles: ${exercise.primaryMuscles}</p>
-            <p>${exercise.instructions}</p>
-        `).join('');
-
             // Send the list of exercises as response
-            res.send(`
-            <ul>${exercisesHTML}</ul>
-        `);
+            res.render('exercise', {filteredExercises});
         });
     } catch (error) {
         // Handle error
@@ -262,7 +280,12 @@ app.get('/', (req, res) => {
             if (req.query.search != null){
                 jsonData = jsonData.filter(item => item.name.toLowerCase().includes(req.query.search));
                 searchParam = req.query.search;
-                }
+            }
+
+            let filter = req.query.filter || "";
+            if (filter){
+                jsonData = jsonData.filter(item => item.level == req.query.filter);
+            }
 
             // Calculate pagination parameters
             const pageSize = 10; // Number of exercises per page
@@ -282,42 +305,13 @@ app.get('/', (req, res) => {
                 id: item.id
             }));
 
-            // Generate HTML for each exercise on the current page
-            const exercisesHTML = exercisesInfo.map(exercise => `
-                <li id="${exercise.name}">
-                    <a href="${exercise.id}">
-                        <h3>${exercise.name}</h3>
-                        <img src="./exercises/${exercise.images[0]}" alt="${exercise.name}">
-                        <p>${exercise.instructions}</p>
-                    </a>
-                </li>
-            `).join('');
-
             // Generate page counter links
             const pageLinks = Array.from({ length: totalPages }, (_, index) => index + 1)
-                .map(page => `<a href="/?search=${searchParam}&page=${page}"${page === currentPage ? ' class="active"' : ''}>${page}</a>`)
+                .map(page => `<a href="/?filter=${filter}&search=${searchParam}&page=${page}"${page === currentPage ? ' class="active"' : ''}>${page}</a>`)
                 .join(' | ');
 
             // Send the list of exercises for the current page as response
-            res.send(`
-            Welcome
-            <form action=/createUser method=get> 
-                <button type=submit>Sign Up</button> 
-            </form>
-            <form action="/login" method="get">
-                <button type="submit">Login</button>
-            </form>
-            <form action="/search" method="post">
-            <input name="search" id="searchbar" class="form-control me-2"
-                type="search" placeholder="Search" aria-label="Search">
-                <button>Submit</button>
-            </form>
-            <h1>List of Exercises</h1>
-            <ul>${exercisesHTML}</ul>
-            <div>
-                Pages: ${pageLinks}
-            </div>
-            `);
+            res.render('exerciselist', {searchParam, exercisesInfo, pageLinks});
         });
     } catch (error) {
         // Handle error
@@ -327,12 +321,13 @@ app.get('/', (req, res) => {
 });
 
 app.post('/search', async (req, res) => {
-    var search = req.body.search;
+    let search = req.body.search;
     res.redirect("/?search=" + search);
 });
-
+ 
 
 app.get("*", (req, res) => {
+    console.log("404");
     res.status(404);
     res.send("Page not found - 404");
 }) 
