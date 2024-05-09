@@ -220,22 +220,6 @@ app.get('/goals', (req, res) => {
     res.render('goals');
 });
 
-app.get('/profile', (req, res) => {
-    res.render('userProfile');
-});
-
-app.get('/editProfile', (req, res) => {
-    res.render('editProfile');
-});
-
-app.get('/schedule', (req, res) => {
-    res.render('schedule');
-});
-
-app.get('/goals', (req, res) => {
-    res.render('goals');
-});
-
 app.get('/exercise/:id', (req, res) => {
     try {
         // Read the JSON file
