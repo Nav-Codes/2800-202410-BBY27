@@ -25,7 +25,7 @@ require('dotenv').config();
 const MongoStore = require('connect-mongo');
 const saltRounds = 12;
 
-const expireTime = 3600;
+const expireTime = 3600 * 1000;
 
 //openai
 const openai_api_key = process.env.OPENAI_API_KEY; 
