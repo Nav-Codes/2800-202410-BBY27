@@ -291,8 +291,6 @@ app.get('/exercise/:id', (req, res) => {
     }
 });
 
-
-
 app.get('/exercises', (req, res) => {
     try {
         // Read the JSON file
@@ -402,6 +400,10 @@ app.post('/aiTalk', async (req, res) => {
         max_tokens: 60 
     })
     res.send(response['choices'][0]['message']['content'].trim()); 
+});
+
+app.get('/', (req, res) => {
+    res.render('home');
 });
  
 app.get("*", (req, res) => {
