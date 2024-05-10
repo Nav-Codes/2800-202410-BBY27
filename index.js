@@ -14,11 +14,6 @@ app.use('/exercises', express.static(path.join('exercises')));
 
 app.set('view engine', 'ejs');
 
-// Serve static files from the dist/exercises directory
-app.use('/exercises', express.static(path.join('exercises')));
-
-app.set('view engine', 'ejs');
-
 //port
 const port = process.env.PORT || 3000;
 
