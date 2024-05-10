@@ -309,7 +309,8 @@ app.get('/exercises', (req, res) => {
 
 app.post('/search', async (req, res) => {
     let search = req.body.search;
-    res.redirect("/exercises/?search=" + search);
+    let filter = req.body.filter || "";
+    res.redirect("/exercises/?filter=" + filter + "&search=" + search);
 });
 
 app.get('/ai', async (req,res) =>{
