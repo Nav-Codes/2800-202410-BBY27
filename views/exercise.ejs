@@ -1,16 +1,41 @@
 <%- include('./templates/header'); %>
-<% let exercisesHTML = '<ul>'; %>
-<% if (filteredExercises == "") { %>
-    <% exercisesHTML += "<h3>Exercise not found</h3>"; %>
-<% } else { %>
-    <% exercisesHTML += filteredExercises.map(exercise => { %>
-        <h3><%= exercise.name %></h3>
-        <img src="/exercises/<%= exercise.images[0] %>" alt="<%= exercise.name %>">
-        <p>level: <%= exercise.level %>, equipment: <%= exercise.equipment %></p>
-        <p>muscles: <%= exercise.primaryMuscles %></p>
-        <p><%= exercise.instructions %></p>
-    <% }).join(''); %>
-<% } %>
-<% exercisesHTML += '</ul>'; %>
-<%- exercisesHTML %>
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col text-center">
+            <% if (filteredExercises == "") { %>
+                <h3>Exercise not found</h3>
+            <% } else { %>
+                <ul class="list-group">
+                    <% filteredExercises.forEach(exercise => { %>
+                        <li class="list-group-item">
+                            <h3><%= exercise.name.charAt(0).toUpperCase() + exercise.name.slice(1) %></h3>
+                            <img src="/exercises/<%= exercise.images[0] %>" alt="<%= exercise.name %>" class="img-fluid">
+                            <p>
+                                <strong>Difficulty:</strong>
+                                <%= exercise.level.charAt(0).toUpperCase() + exercise.level.slice(1) %>
+                                <% if (exercise.equipment != null) { %>
+                                    <strong>Equipment:</strong> <%= exercise.equipment.charAt(0).toUpperCase() + exercise.equipment.slice(1) %>
+                                <% } %>
+                            </p>
+                            <p>
+                                <strong>Primary Muscles:</strong>
+                                <%= exercise.primaryMuscles[0].charAt(0).toUpperCase() + exercise.primaryMuscles[0].slice(1) %>
+                                <% if (exercise.secondaryMuscles[0] != null) { %>
+                                    <strong>Accessory Muscles:</strong>
+                                    <%= exercise.secondaryMuscles.map(muscle => muscle.charAt(0).toUpperCase() + muscle.slice(1)).join(', ') %>
+                                <% } %>
+                            </p>
+                            <p>
+                                <strong>Instructions:</strong>
+                                <%= exercise.instructions.join(' ') %>
+                            </p>
+                        </li>
+                    <% }); %>
+                </ul>
+            <% } %>
+        </div>
+    </div>
+</div>
+
 <%- include('./templates/footer'); %>

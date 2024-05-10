@@ -1,3 +1,4 @@
+//express constants
 require("./utils.js");
 
 //express constants
@@ -23,6 +24,20 @@ const MongoStore = require('connect-mongo');
 const saltRounds = 12;
 
 const expireTime = 3600;
+
+//openai
+const openai_api_key = process.env.OPENAI_API_KEY; 
+const { OpenAI } = require('openai');
+const openai = new OpenAI(openai_api_key);
+
+const readline = require('readline');
+const userInterface = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+});
+
+const bodyParser = require('body-parser');
+app.use(bodyParser.json());
 
 //crypt const
 const bcrypt = require('bcrypt');
@@ -58,14 +73,12 @@ app.use(session({
 }
 ));
 
-app.set('view engine', 'ejs');
-
 app.get('/filtering/:filter', (req,res) => {
-    res.redirect('/?filter=' + req.params.filter);
+    res.redirect('/exercises/?filter=' + req.params.filter);
 });
 
 app.get('/createUser', (req,res) => {
-    res.render("signUpForm");
+    res.render("signUpForm", {duplicate: 0, InvalidField: 0});
 });
 
 
@@ -84,7 +97,7 @@ app.post('/submitUser', async (req,res) => {
 	const validationResult = schema.validate({email, password, name});
 	if (validationResult.error != null) {
 	   console.log(validationResult.error);
-	   res.redirect("/createUser");
+	   res.render("signUpForm",{duplicate: 0, InvalidField: 1})
 	   return;
    }
 
@@ -92,31 +105,38 @@ app.post('/submitUser', async (req,res) => {
 
     const result = await userCollection.find({email: email}).project({email: 1, password: 1, name: 1, _id: 1}).toArray();
 
-    if(!(result[0].email === email || result[0].name === name)){
-	await userCollection.insertOne({email: email, password: hashedPassword, name: name});
-	console.log("Inserted user");
-
-    // Set user details in the session
-    req.session.authenticated = true;
-    req.session.email = email;
-    req.session.name = name;
-    req.session.cookie.maxAge = expireTime;
-
-    var html = `
-    Successfully Created User
-    <form action="/member" method="get">
-    <button type="submit">Member</button>
-    </form>
-    <form action="/logout" method="get">
-    <button type="submit">LogOut</button>
-    </form>
-    `;
-    res.send(html);
-    }
-    else {
-        const uses = {duplicate: 1};
-        res.render("signUpForm", {uses: uses});
-    }
+    if (!result || result.length === 0) {
+        // No user found with the given email
+        await userCollection.insertOne({ email: email, password: hashedPassword, name: name });
+        console.log("Inserted user");
+    
+        // Set user details in the session
+        req.session.authenticated = true;
+        req.session.email = email;
+        req.session.name = name;
+        req.session.cookie.maxAge = expireTime;
+    
+        //temp redirect till homepage complete.
+        res.redirect("/");
+    } else {
+        // Check for duplicate email or name
+        const existingUser = result.find(user => user.email === email || user.name === name);
+        if (existingUser) {
+            res.render("signUpForm", { duplicate: 1, InvalidField: 0 });
+        } else {
+            // No duplicate found, insert new user
+            await userCollection.insertOne({ email: email, password: hashedPassword, name: name });
+            console.log("Inserted user");
+    
+            // Set user details in the session
+            req.session.authenticated = true;
+            req.session.email = email;
+            req.session.name = name;
+            req.session.cookie.maxAge = expireTime;
+    
+            //temp redirect till homepage complete.
+            res.redirect("/");
+        }}
 });
 
 
@@ -159,6 +179,7 @@ app.post('/loggingin', async (req,res) => {
         req.session.name = user.name;
 		req.session.cookie.maxAge = expireTime;
 
+       
 		res.redirect('/loggedIn');
 		return;
 	}
@@ -182,17 +203,9 @@ app.get('/loggedin', async (req, res) => {
         if (user) {
             // If user found, display the logged-in message along with the user's name
             req.session.name = user.name;
-
-            var html = `
-                Welcome ${user.name}!
-                <form action="/member" method="get">
-                    <button type="submit">Member</button>
-                </form>
-                <form action="/logout" method="get">
-                    <button type="submit">Log Out</button>
-                </form>
-            `;
-            res.send(html);
+            
+            //temp redirect till homepage complete.
+            res.redirect("/")
         } else {
             // If user not found, log out the user
             req.session.destroy();
@@ -247,7 +260,7 @@ app.get('/exercise/:id', (req, res) => {
 
 
 
-app.get('/', (req, res) => {
+app.get('/exercises', (req, res) => {
     try {
         // Read the JSON file
         fs.readFile("./dist/exercises.json", 'utf8', (err, data) => {
@@ -282,20 +295,10 @@ app.get('/', (req, res) => {
             const endIndex = Math.min(startIndex + pageSize, jsonData.length);
 
             // Extract names, images, and descriptions from the JSON data for the current page
-            const exercisesInfo = jsonData.slice(startIndex, endIndex).map(item => ({
-                name: item.name,
-                images: item.images,
-                instructions: item.instructions,
-                id: item.id
-            }));
-
-            // Generate page counter links
-            const pageLinks = Array.from({ length: totalPages }, (_, index) => index + 1)
-                .map(page => `<a href="/?filter=${filter}&search=${searchParam}&page=${page}"${page === currentPage ? ' class="active"' : ''}>${page}</a>`)
-                .join(' | ');
+            const exercisesInfo = jsonData.slice(startIndex, endIndex);
 
             // Send the list of exercises for the current page as response
-            res.render('exerciselist', {searchParam, exercisesInfo, pageLinks});
+            res.render('exerciselist', {searchParam, exercisesInfo, currentPage, filter, totalPages});
         });
     } catch (error) {
         // Handle error
@@ -306,10 +309,68 @@ app.get('/', (req, res) => {
 
 app.post('/search', async (req, res) => {
     let search = req.body.search;
-    res.redirect("/?search=" + search);
+    res.redirect("/exercises/?search=" + search);
+});
+
+app.get('/ai', async (req,res) =>{
+    const response = await openai.chat.completions.create({
+        model: 'gpt-3.5-turbo',
+        messages: [{"role":"user", "content":"Give me a poem?"}],
+        max_tokens: 60
+    })
+    res.json({ message: response['choices'][0]['message']['content'].trim() });
+});
+
+// app.get('/aiTalk', async (req,res) =>{
+//     res.send(`
+//     <input type="text" id="userInput">
+//     <button onclick="send()">Send</button>
+//     `);
+//     userInterface.prompt()
+//     userInterface.on('line', async (line) => {
+//         const response = await openai.chat.completions.create({
+//             model: 'gpt-3.5-turbo',
+//             messages: [{"role":"user", "content":line}],
+//             max_tokens: 60
+//         })
+//         console.log(response['choices'][0]['message']['content'].trim());
+//         userInterface.prompt();
+//     });
+// });
+
+app.get('/aiTalk', (req, res) => {
+    res.send(`
+        <input type="text" id="userInput"> 
+        <button onclick="send()">Send</button> 
+        <script>
+            function send() {
+                const userInput = document.getElementById('userInput').value;
+                fetch('/aiTalk', {
+                    method: 'POST', 
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ line: userInput }),
+                })
+                .then(response => response.text())
+                .then(data => {
+                    console.log(data);
+                });
+            }
+        </script>
+    `);
+});
+
+app.post('/aiTalk', async (req, res) => {
+    const line = req.body.line; // extracts the 'line' property from the request body
+    const response = await openai.chat.completions.create({ // sends request to OpenAI API to generate a response
+        model: 'gpt-3.5-turbo', 
+        messages: [{"role":"user", "content":line}], 
+        max_tokens: 60 
+    })
+    res.send(response['choices'][0]['message']['content'].trim()); 
 });
  
-
 app.get("*", (req, res) => {
     console.log("404");
     res.status(404);
@@ -319,4 +380,4 @@ app.get("*", (req, res) => {
 
 app.listen(port, () => {
     console.log("Node application listening on port " + port);
-}); 
+});
