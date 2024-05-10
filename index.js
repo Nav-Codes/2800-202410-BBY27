@@ -3,10 +3,12 @@ require("./utils.js");
 
 //express constants
 const express = require('express');
+const favicon = require('serve-favicon');
+const path = require('path');
 const app = express();
+app.use(favicon(path.join(__dirname,'public','favicon.ico')));
 const session = require('express-session');
 const fs = require('fs');
-const path = require('path');
 app.use(express.urlencoded({extended: false}));
 
 // Serve static files from the dist/exercises directory
@@ -63,7 +65,7 @@ var mongoStore = MongoStore.create({
     crypto: {
         secret: mongodb_session_secret
     }
-})
+});
 
 app.use(session({
     secret: node_session_secret,
@@ -340,7 +342,8 @@ app.get('/exercises', (req, res) => {
 
 app.post('/search', async (req, res) => {
     let search = req.body.search;
-    res.redirect("/exercises/?search=" + search);
+    let filter = req.body.filter || "";
+    res.redirect("/exercises/?filter=" + filter + "&search=" + search);
 });
 
 app.get('/ai', async (req,res) =>{
@@ -410,7 +413,7 @@ app.get("*", (req, res) => {
     console.log("404");
     res.status(404);
     res.send("Page not found - 404");
-}) 
+});
 
 
 app.listen(port, () => {
