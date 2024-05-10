@@ -223,7 +223,7 @@ app.get('/loggedin', async (req, res) => {
 });
 
 app.get('/profile', (req, res) => {
-    res.render('userProfile');
+    res.render('userProfile', {username : req.session.name});
 });
 
 app.get('/editProfile', (req, res) => {
