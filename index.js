@@ -358,23 +358,6 @@ app.get('/ai', async (req,res) =>{
     res.json({ message: response['choices'][0]['message']['content'].trim() });
 });
 
-// app.get('/aiTalk', async (req,res) =>{
-//     res.send(`
-//     <input type="text" id="userInput">
-//     <button onclick="send()">Send</button>
-//     `);
-//     userInterface.prompt()
-//     userInterface.on('line', async (line) => {
-//         const response = await openai.chat.completions.create({
-//             model: 'gpt-3.5-turbo',
-//             messages: [{"role":"user", "content":line}],
-//             max_tokens: 60
-//         })
-//         console.log(response['choices'][0]['message']['content'].trim());
-//         userInterface.prompt();
-//     });
-// });
-
 app.get('/aiTalk', (req, res) => {
     res.send(`
         <input type="text" id="userInput"> 
