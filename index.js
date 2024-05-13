@@ -51,6 +51,7 @@ const Joi = require("joi");
 
 var {database} = include('databaseConnection.js');
 const userCollection = database.db(process.env.MONGODB_DATABASE).collection(process.env.MONGODB_COLLECTION);
+const scheduleCollection = database.db(process.env.MONGODB_DATABASE).collection(process.env.MONGODB_COLLECTION_SCHEDULE);
 
 /* secret information section */
 const mongodb_host = process.env.MONGODB_HOST;
@@ -85,6 +86,21 @@ app.get('/createUser', (req,res) => {
     res.render("signUpForm", {duplicate: 0, InvalidField: 0});
 });
 
+//creates a sample schedule with default workouts set to 'empty'
+function createSchedule(email) {
+    scheduleCollection.insertOne({
+        email : email, 
+        sunday : ['empty'],
+        monday : ['empty'],
+        tuesday : ['empty'],
+        wednesday : ['empty'],
+        thrusday : ['empty'],
+        friday : ['empty'],
+        saturday : ['empty'],
+    });
+    console.log('created empty schedule');
+}
+
 app.post('/submitUser', async (req,res) => {
     var email = req.body.email;
     var name = req.body.name;
@@ -118,6 +134,9 @@ app.post('/submitUser', async (req,res) => {
         req.session.email = email;
         req.session.name = name;
         req.session.cookie.maxAge = expireTime;
+
+        //create sample workout schedule that contain empty for each day of the week
+        createSchedule(email);
     
         //temp redirect till homepage complete.
         res.redirect("/");
@@ -136,6 +155,9 @@ app.post('/submitUser', async (req,res) => {
             req.session.email = email;
             req.session.name = name;
             req.session.cookie.maxAge = expireTime;
+
+            //create sample workout schedule that contain empty for each day of the week
+            createSchedule(email);
     
             //temp redirect till homepage complete.
             res.redirect("/");
