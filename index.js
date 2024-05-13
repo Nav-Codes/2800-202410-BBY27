@@ -52,7 +52,6 @@ const Joi = require("joi");
 var {database} = include('databaseConnection.js');
 const userCollection = database.db(process.env.MONGODB_DATABASE).collection(process.env.MONGODB_COLLECTION);
 
-
 /* secret information section */
 const mongodb_host = process.env.MONGODB_HOST;
 const mongodb_user = process.env.MONGODB_USER;
@@ -85,7 +84,6 @@ app.get('/filtering/:filter', (req,res) => {
 app.get('/createUser', (req,res) => {
     res.render("signUpForm", {duplicate: 0, InvalidField: 0});
 });
-
 
 app.post('/submitUser', async (req,res) => {
     var email = req.body.email;
@@ -144,7 +142,6 @@ app.post('/submitUser', async (req,res) => {
         }}
 });
 
-
 app.get('/login', (req,res) => {
     res.render("loginForm", { error: { userNoExist: 0, EmailNotEnt: 0, Wrong: 0 }});
 });
@@ -156,15 +153,11 @@ app.post('/loggingin', async (req,res) => {
 	const schema = Joi.string().email().required();
 	const validationResult = schema.validate(email);
     
-
-
 	if (validationResult.error != null) {
         res.render("loginForm", { error: { userNoExist: 0, EmailNotEnt: 1, Wrong: 0 } });
 
         return;
 	}
-
-
 
 	const result = await userCollection.find({email: email}).project({email: 1, password: 1, name: 1, _id: 1}).toArray();
 
@@ -174,7 +167,6 @@ app.post('/loggingin', async (req,res) => {
 		return;
 	}
 
-    
     const user = result[0];
 
 	if (await bcrypt.compare(password, result[0].password)) {
@@ -183,8 +175,7 @@ app.post('/loggingin', async (req,res) => {
 		req.session.email = user.email;
         req.session.name = user.name;
 		req.session.cookie.maxAge = expireTime;
-
-       
+   
 		res.redirect('/loggedIn');
 		return;
 	}
