@@ -86,17 +86,17 @@ app.get('/createUser', (req,res) => {
     res.render("signUpForm", {duplicate: 0, InvalidField: 0});
 });
 
-//creates a sample schedule with default workouts set to 'empty'
+//creates a sample schedule with default workout
 function createSchedule(email) {
     scheduleCollection.insertOne({
         email : email, 
-        sunday : ['empty'],
-        monday : ['empty'],
-        tuesday : ['empty'],
-        wednesday : ['empty'],
-        thrusday : ['empty'],
-        friday : ['empty'],
-        saturday : ['empty'],
+        Sunday : ['rest'],
+        Monday : ['bicep curls', 'tricep rows'],
+        Tuesday : ['lunges', 'sqauts'],
+        Wednesday : ['rest'],
+        Thursday : ['back pull', 'bench press'],
+        Friday : ['pushups', 'pull ups'],
+        Saturday : ['active rest'],
     });
     console.log('created empty schedule');
 }
@@ -243,40 +243,14 @@ app.get('/editProfile', (req, res) => {
     res.render('editProfile');
 });
 
-const workouts = {
-    work : [
-        {
-            date: 'sunday',
-            workoutList: ['rest']
-        },
-        {
-            date: 'monday',
-            workoutList: ['push-ups', 'pull-ups', 'bicep curls']
-        },
-        {
-            date: 'tuesday',
-            workoutList: ['lunges', 'squats']
-        },
-        {
-            date: 'wednesday',
-            workoutList: ['rest']
-        },
-        {
-            date: 'thursday',
-            workoutList: ['lat pull down', 'bench press']
-        },
-        {
-            date: 'friday',
-            workoutList: ['tricep extensions', 'push ups']
-        },
-        {
-            date: 'saturday',
-            workoutList: ['active rest']
-        },
-    ]
-};
+app.get('/schedule', async (req, res) => {
 
-app.get('/schedule', (req, res) => {
+    //gets workout schedule based on unique email
+    const workouts = await scheduleCollection
+    .find({email : req.session.email})
+    .project({Sunday : 1, Monday : 1, Tuesday : 1, Wednesday : 1, Thursday : 1, Friday : 1, Saturday : 1})
+    .toArray();
+
     res.render('schedule', {workouts});
 });
 
