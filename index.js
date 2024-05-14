@@ -6,6 +6,7 @@ const express = require('express');
 const favicon = require('serve-favicon');
 const path = require('path');
 const app = express();
+const nodemailer = require('nodemailer');
 
 app.use(favicon(path.join(__dirname,'public','favicon.ico')));
 
@@ -77,6 +78,7 @@ app.use(session({
 }
 ));
 
+
 app.get('/filtering/:filter', (req,res) => {
     res.redirect('/exercises/?filter=' + req.params.filter);
 });
@@ -140,6 +142,34 @@ app.post('/submitUser', async (req,res) => {
             //temp redirect till homepage complete.
             res.redirect("/");
         }}
+});
+
+
+app.post('/forgotpassword', async (req, res) => {
+    let transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+          user: 'wefitpass@gmail.com',
+          pass: 'ghcjcvmhksrcxpqp '
+        }
+      });
+    
+    try {
+        await transporter.sendMail({
+            from: 'wefitpass@gmail.com',
+            to: req.body.email,
+            subject: 'AccountInfo',
+            text: 'Test'
+        });
+
+        // Redirect after the email is sent successfully
+        res.redirect('/login');
+    } catch (error) {
+        // Handle errors that occur during email sending
+        console.error('Error sending email:', error);
+        // You can also send a response indicating that there was an error
+        res.status(500).send('Error sending email');
+    }
 });
 
 app.get('/login', (req,res) => {
