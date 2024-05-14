@@ -146,6 +146,15 @@ app.post('/submitUser', async (req,res) => {
 
 
 app.post('/forgotpassword', async (req, res) => {
+    let email = req.body.email
+    const result = await userCollection.find({email: email}).project({email: 1, password: 1, name: 1, _id: 1}).toArray();
+
+	if (result.length != 1) {
+        console.log("Email doesn't exist");
+        res.redirect("/login");
+		return;
+	}
+
     let transporter = nodemailer.createTransport({
         service: 'gmail',
         auth: {
@@ -157,7 +166,7 @@ app.post('/forgotpassword', async (req, res) => {
     try {
         await transporter.sendMail({
             from: 'wefitpass@gmail.com',
-            to: req.body.email,
+            to: email,
             subject: 'AccountInfo',
             text: 'Test'
         });
