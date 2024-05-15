@@ -1,7 +1,9 @@
 <%-include('templates/header');%>
     <head>
         <style>
-            /* Custom CSS for horizontal scrolling */
+            /* Credit: ChatGPT
+            Helped create a hotizontal scrolling feature 
+            Custom CSS for horizontal scrolling */
             .scrolling-wrapper {
                 overflow-x: auto;
                 white-space: nowrap;
@@ -13,12 +15,17 @@
                 height: 400px;
                 overflow-x: hidden;
                 /* Adjust as needed */
-                margin-right: 10px;
+                /*margin-right: 10px;*/
                 /* Adjust as needed */
             }
 
             li {
                 margin-left: -25px;
+            }
+
+            #newItem {
+                width: 130px;
+                margin-left: 15px;
             }
         </style>
     </head>
@@ -40,16 +47,16 @@
                                 <ul>
                                     <% for (let j = 0; j < workouts[0][day].length; j++) { %>
                                         <li>
-                                            <%= //find a way to get length of string so you can add br tag appropriately
-                                                workouts[0][day][j] %>
+                                            <%= workouts[0][day][j] %>
                                         </li>
                                     <% } %>
                                 </ul>
                             </div>
+                            <form action="/scheduleEditor/<%=currentDay%>" method="get">
+                                <button class="btn btn-outline-primary">Edit</button>
+                            </form>
                         </div>
-                        <% } %>
-                    <!-- Cards -->
-                    <!-- Add more cards here -->
+                    <% } %>
                 </div>
             </div>
         </div>

@@ -15,6 +15,7 @@ app.use(express.urlencoded({extended: false}));
 
 // Serve static files from the dist/exercises directory
 app.use('/exercises', express.static(path.join('exercises')));
+app.use('/scripts', express.static(path.join('scripts')));
 
 app.set('view engine', 'ejs');
 
@@ -252,6 +253,76 @@ app.get('/schedule', async (req, res) => {
     .toArray();
 
     res.render('schedule', {workouts});
+});
+
+app.get('/scheduleEditor/:day', async (req, res) => {
+    //gets workout schedule based on unique email    
+    
+    //Credit: ChatGPT
+    //This creates a projection object that references a property of an object
+    const projection = {};
+    projection[req.params.day] = 1;
+
+    const workouts = await scheduleCollection
+        .find({ email: req.session.email })
+        .project(projection)
+        .toArray();
+
+        try {
+            // Read the JSON file
+            fs.readFile("./dist/exercises.json", 'utf8', (err, data) => {
+                if (err) {
+                    console.error('Error reading file:', err);
+                    res.status(500).send('Internal Server Error');
+                    return;
+                }
+    
+                let searchParam = "";
+    
+                // Parse the JSON data
+                let jsonData = JSON.parse(data);
+                if (req.query.search != null){
+                    jsonData = jsonData.filter(item => item.name.toLowerCase().includes(req.query.search));
+                    searchParam = req.query.search;
+                }
+    
+                let filter = req.query.filter || "";
+                if (filter){
+                    jsonData = jsonData.filter(item => item.level == req.query.filter);
+                }
+    
+                // Calculate pagination parameters
+                const pageSize = 20; // Number of exercises per page
+                const totalPages = Math.ceil(jsonData.length / pageSize);
+                let currentPage = parseInt(req.query.page) || 1; // Default to page 1 if not specified
+                currentPage = Math.min(Math.max(currentPage, 1), totalPages); // Ensure current page is within valid range
+    
+                // Calculate the start and end indices of exercises for the current page
+                const startIndex = (currentPage - 1) * pageSize;
+                const endIndex = Math.min(startIndex + pageSize, jsonData.length);
+    
+                // Extract names, images, and descriptions from the JSON data for the current page
+                const exercisesInfo = jsonData.slice(startIndex, endIndex);
+    
+                // Send the list of exercises for the current page as response
+                res.render('scheduleEditor', {workouts, searchParam, exercisesInfo, currentPage, filter, totalPages});
+            });
+        } catch (error) {
+            // Handle error
+            console.error('Error:', error);
+            res.status(500).send('Internal Server Error');
+        }
+    
+    //number of page buttons: max 5, min 3
+    //number of workouts: 20 without the pictures
+
+    // res.render('scheduleEditor', {workouts});
+});
+
+app.post('/scheduleSave', (req, res) => {
+    //update database here
+
+    res.redirect('/schedule');
 });
 
 app.get('/goals', (req, res) => {
