@@ -1,0 +1,45 @@
+<%-include('templates/header');%>
+<div id="chat">
+  <form id="form0" onsubmit="event.preventDefault(); send(0);">
+    <div class="fixed-bottom d-flex" style="position: fixed; bottom: 0; width: 100%; padding: 10px;">
+      <input type="text" id="userInput0" class="form-control flex-grow-1" placeholder="Question" aria-label="Enter question" aria-describedby="button-addon2" autocomplete="off">
+        <button class="btn btn-outline-secondary ml-2" type="submit" id="button-addon2">Send</button>
+    </div>
+  </form>
+</div>
+<script>
+  // Define a function to send a message to the server
+  function send(id) {
+    // Get the user's input from the input field with the corresponding id
+    const userInput = document.getElementById("userInput" + id).value;
+
+    // Send a POST request to the '/ai' endpoint on the server
+    fetch("/ai", {
+      method: "POST",
+      headers: {
+        // Specify that the request body will be a JSON string
+        "Content-Type": "application/json",
+      },
+      // Set the request body to a JSON string that represents an object with a 'line' property
+      body: JSON.stringify({ line: userInput }),
+    })
+      .then((response) => response.text()) // Convert the server's response to text
+      .then((data) => {
+        // Get the 'chat' div
+        const chat = document.getElementById("chat");
+
+        // Create a new div for the AI's response
+        const responseDiv = document.createElement("div");
+        // Set the text content of the new div to the AI's response
+        responseDiv.textContent = "AI: " + data;
+        // Add Bootstrap classes to the new div
+        responseDiv.className = "alert alert-secondary mt-3";
+        // Append the new div to the 'chat' div
+        chat.appendChild(responseDiv);
+
+        // Clear the input field
+        document.getElementById("userInput" + id).value = "";
+      });
+  }
+</script>
+<%-include('templates/footer');%>

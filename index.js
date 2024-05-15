@@ -340,44 +340,16 @@ app.post('/search', async (req, res) => {
     res.redirect("/exercises/?filter=" + filter + "&search=" + search);
 });
 
-app.get('/ai', async (req,res) =>{
-    const response = await openai.chat.completions.create({
-        model: 'gpt-3.5-turbo',
-        messages: [{"role":"user", "content":"Give me a poem?"}],
-        max_tokens: 60
-    })
-    res.json({ message: response['choices'][0]['message']['content'].trim() });
+app.get('/ai', (req, res) => {
+    res.render('ai');
 });
 
-app.get('/aiTalk', (req, res) => {
-    res.send(`
-        <input type="text" id="userInput"> 
-        <button onclick="send()">Send</button> 
-        <script>
-            function send() {
-                const userInput = document.getElementById('userInput').value;
-                fetch('/aiTalk', {
-                    method: 'POST', 
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ line: userInput }),
-                })
-                .then(response => response.text())
-                .then(data => {
-                    console.log(data);
-                });
-            }
-        </script>
-    `);
-});
-
-app.post('/aiTalk', async (req, res) => {
+app.post('/ai', async (req, res) => {
     const line = req.body.line; // extracts the 'line' property from the request body
     const response = await openai.chat.completions.create({ // sends request to OpenAI API to generate a response
         model: 'gpt-3.5-turbo', 
         messages: [{"role":"user", "content":line}], 
-        max_tokens: 60 
+        max_tokens: 20 
     })
     res.send(response['choices'][0]['message']['content'].trim()); 
 });
