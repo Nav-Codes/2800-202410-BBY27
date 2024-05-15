@@ -7,6 +7,7 @@ const favicon = require('serve-favicon');
 const path = require('path');
 const app = express();
 const nodemailer = require('nodemailer');
+const { createHmac } = require('node:crypto');
 
 app.use(favicon(path.join(__dirname,'public','favicon.ico')));
 
@@ -146,6 +147,10 @@ app.post('/submitUser', async (req,res) => {
         }}
 });
 
+app.get('/resetpassword/:token', (req, res) =>{
+    token = req.params.token;
+    res.render('passwordReset', {token});
+});
 
 app.post('/forgotpassword', async (req, res) => {
     let email = req.body.email
@@ -157,6 +162,12 @@ app.post('/forgotpassword', async (req, res) => {
         // res.redirect("/login");
 		return;
 	}
+
+    const secret = 'abcdefg';
+        const hash = createHmac('sha256', secret)
+               .update('I love cupcakes')
+               .digest('hex');
+        await userCollection.updateOne({email: email}, {$set:{resetToken: hash}});
 
     let transporter = nodemailer.createTransport({
         service: 'gmail',
@@ -171,10 +182,9 @@ app.post('/forgotpassword', async (req, res) => {
             from: 'wefitpass@gmail.com',
             to: email,
             subject: 'AccountInfo',
-            text: 'Account password:' + result[0].password
+            text: 'link: http://localhost:3000/resetpassword/' + hash
         });
-        //ajax calls route that i create
-        // Redirect after the email is sent successfully
+
         res.json({status:"success", message:"Thank you for submitting your request. If a valid email was used, an email will be sent to that account. Please check your inbox for further information."});
     } catch (error) {
         // Handle errors that occur during email sending
@@ -183,6 +193,36 @@ app.post('/forgotpassword', async (req, res) => {
         res.status(500).send('Error sending email');
     }
 });
+
+app.post('/resetpassword/:token', async (req, res) => {
+    let token = req.params.token;
+    let newPassword = req.body.password;
+    console.log(token);
+    // Hash the new password
+    let hashedPassword = await bcrypt.hash(newPassword, saltRounds);
+
+    try {
+        // Find the user with the given reset token
+        const user = await userCollection.findOne({ resetToken: token });
+        if (!user) {
+            // If no user is found with the given reset token, handle the error
+            return res.status(400).send('Invalid reset token');
+        }
+
+        // Update the user's password with the new hashed password
+        await userCollection.updateOne({ resetToken: token }, { $set: { password: hashedPassword } });
+
+        // Unset the reset token from the user document
+        await userCollection.updateOne({ resetToken: token }, { $unset: { resetToken: 1 } });
+
+        // Redirect the user to the home page or any other desired page
+        res.redirect('/');
+    } catch (error) {
+        console.error('Error resetting password:', error);
+        res.status(500).send('Error resetting password');
+    }
+});
+
 
 app.get('/login', (req,res) => {
     res.render("loginForm", { error: { userNoExist: 0, EmailNotEnt: 0, Wrong: 0 }});
