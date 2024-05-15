@@ -16,6 +16,8 @@ app.use(express.urlencoded({extended: false}));
 
 // Serve static files from the dist/exercises directory
 app.use('/exercises', express.static(path.join('exercises')));
+app.use(express.static(__dirname));
+app.use('/login', express.static(path.join(__dirname, '/public/js')));
 
 app.set('view engine', 'ejs');
 
@@ -145,15 +147,13 @@ app.post('/submitUser', async (req,res) => {
 });
 
 
-//instead of res.redirect()
-  //res.json({status: "error/success", message=""})
 app.post('/forgotpassword', async (req, res) => {
     let email = req.body.email
     const result = await userCollection.find({email: email}).project({email: 1, password: 1, name: 1, _id: 1}).toArray();
 
 	if (result.length != 1) {
         console.log("Email doesn't exist");
-        res.json({status:"error", message:"Email dne"});
+        res.json({status:"error", message:"Thank you for submitting your request. If a valid email was used, an email will be sent to that account. Please check your inbox for further information."});
         // res.redirect("/login");
 		return;
 	}
@@ -171,11 +171,11 @@ app.post('/forgotpassword', async (req, res) => {
             from: 'wefitpass@gmail.com',
             to: email,
             subject: 'AccountInfo',
-            text: 'Test'
+            text: 'Account password:' + result[0].password
         });
         //ajax calls route that i create
         // Redirect after the email is sent successfully
-        res.redirect('/login');
+        res.json({status:"success", message:"Thank you for submitting your request. If a valid email was used, an email will be sent to that account. Please check your inbox for further information."});
     } catch (error) {
         // Handle errors that occur during email sending
         console.error('Error sending email:', error);
