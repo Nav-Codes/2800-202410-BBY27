@@ -7,7 +7,28 @@
     </div>
   </form>
 </div>
+
+<!-- Modal -->
+<div class="modal" id="welcomeModal" tabindex="-1" aria-labelledby="welcomeModalLabel" aria-hidden="true" style="display: block;">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="welcomeModalLabel">Welcome</h5>
+        <button type="button" class="btn btn-light" onclick="closeModal()" aria-label="Close">X</button>
+      </div>
+      <div class="modal-body">
+          This is the AI assistant, I can help with any of your fitness related questions! Please type your question in the input field below.
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
+  // Define a function to close the modal
+  function closeModal() {
+    document.getElementById('welcomeModal').style.display = 'none';
+  }
+
   // Define a function to send a message to the server
   function send(id) {
     // Get the user's input from the input field with the corresponding id
@@ -39,6 +60,9 @@
 
         // Clear the input field
         document.getElementById("userInput" + id).value = "";
+
+        // Hide the modal
+        closeModal();
       });
   }
 </script>
