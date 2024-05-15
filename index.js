@@ -145,13 +145,16 @@ app.post('/submitUser', async (req,res) => {
 });
 
 
+//instead of res.redirect()
+  //res.json({status: "error/success", message=""})
 app.post('/forgotpassword', async (req, res) => {
     let email = req.body.email
     const result = await userCollection.find({email: email}).project({email: 1, password: 1, name: 1, _id: 1}).toArray();
 
 	if (result.length != 1) {
         console.log("Email doesn't exist");
-        res.redirect("/login");
+        res.json({status:"error", message:"Email dne"});
+        // res.redirect("/login");
 		return;
 	}
 
@@ -170,7 +173,7 @@ app.post('/forgotpassword', async (req, res) => {
             subject: 'AccountInfo',
             text: 'Test'
         });
-
+        //ajax calls route that i create
         // Redirect after the email is sent successfully
         res.redirect('/login');
     } catch (error) {
