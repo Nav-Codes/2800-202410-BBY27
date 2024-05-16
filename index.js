@@ -426,9 +426,15 @@ app.get('/token/:token', function (req, res) {
     res.status(200).send(`token is ${token}`)
 });
 
-app.get('/goals', (req, res) => {
-    res.render('goals');
+app.get('/goals', async (req, res) => {
+    if (!req.session.authenticated) {
+        res.redirect('/login');
+    }
+    const result = await userCollection.findOne({ email: req.session.email });
+    console.log(result);
+    res.render('goals', { result });
 });
+
 
 app.post('/addgoal', async (req, res) => {
     let quantity = req.body.quantity;
@@ -438,8 +444,8 @@ app.post('/addgoal', async (req, res) => {
     let goalArray = [];
     goalArray.push(quantity, unit, goal);
 
-    userCollection.updateOne({email: req.session.email}, {$set: {goal: goalArray}});
-    return;
+    userCollection.updateOne({email: req.session.email}, {$push: {goal: goalArray}});
+    res.redirect('/goals');
 });
 
 app.get('/exercise/:id', (req, res) => {
