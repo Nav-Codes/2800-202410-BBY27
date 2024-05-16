@@ -6,6 +6,8 @@ const express = require('express');
 const favicon = require('serve-favicon');
 const path = require('path');
 const app = express();
+const nodemailer = require('nodemailer');
+const { createHmac } = require('node:crypto');
 
 app.use(favicon(path.join(__dirname,'public','favicon.ico')));
 
@@ -15,6 +17,8 @@ app.use(express.urlencoded({extended: false}));
 
 // Serve static files from the dist/exercises directory
 app.use('/exercises', express.static(path.join('exercises')));
+app.use(express.static(__dirname));
+app.use('/login', express.static(path.join(__dirname, '/public/js')));
 
 app.set('view engine', 'ejs');
 
@@ -147,6 +151,83 @@ app.post('/submitUser', async (req,res) => {
             res.redirect("/profile");
         }}
 });
+
+app.get('/resetpassword/:token', (req, res) =>{
+    token = req.params.token;
+    res.render('passwordReset', {token});
+});
+
+app.post('/forgotpassword', async (req, res) => {
+    let email = req.body.email
+    const result = await userCollection.find({email: email}).project({email: 1, password: 1, name: 1, _id: 1}).toArray();
+
+	if (result.length != 1) {
+        console.log("Email doesn't exist");
+        res.json({status:"error", message:"Thank you for submitting your request. If a valid email was used, an email will be sent to that account. Please check your inbox for further information."});
+        // res.redirect("/login");
+		return;
+	}
+
+    const secret = 'abcdefg';
+        const hash = createHmac('sha256', secret)
+               .update('I love cupcakes')
+               .digest('hex');
+        await userCollection.updateOne({email: email}, {$set:{resetToken: hash}});
+
+    let transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+          user: 'wefitpass@gmail.com',
+          pass: 'ghcjcvmhksrcxpqp '
+        }
+      });
+    
+    try {
+        await transporter.sendMail({
+            from: 'wefitpass@gmail.com',
+            to: email,
+            subject: 'AccountInfo',
+            text: 'link: http://localhost:3000/resetpassword/' + hash
+        });
+
+        res.json({status:"success", message:"Thank you for submitting your request. If a valid email was used, an email will be sent to that account. Please check your inbox for further information."});
+    } catch (error) {
+        // Handle errors that occur during email sending
+        console.error('Error sending email:', error);
+        // You can also send a response indicating that there was an error
+        res.status(500).send('Error sending email');
+    }
+});
+
+app.post('/resetpassword/:token', async (req, res) => {
+    let token = req.params.token;
+    let newPassword = req.body.password;
+    console.log(token);
+    // Hash the new password
+    let hashedPassword = await bcrypt.hash(newPassword, saltRounds);
+
+    try {
+        // Find the user with the given reset token
+        const user = await userCollection.findOne({ resetToken: token });
+        if (!user) {
+            // If no user is found with the given reset token, handle the error
+            return res.status(400).send('Invalid reset token');
+        }
+
+        // Update the user's password with the new hashed password
+        await userCollection.updateOne({ resetToken: token }, { $set: { password: hashedPassword } });
+
+        // Unset the reset token from the user document
+        await userCollection.updateOne({ resetToken: token }, { $unset: { resetToken: 1 } });
+
+        // Redirect the user to the home page or any other desired page
+        res.redirect('/');
+    } catch (error) {
+        console.error('Error resetting password:', error);
+        res.status(500).send('Error resetting password');
+    }
+});
+
 
 app.get('/login', (req,res) => {
     res.render("loginForm", { error: { userNoExist: 0, EmailNotEnt: 0, Wrong: 0 }});
