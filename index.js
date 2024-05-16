@@ -120,7 +120,7 @@ app.post('/submitUser', async (req,res) => {
         req.session.cookie.maxAge = expireTime;
     
         //temp redirect till homepage complete.
-        res.redirect("/");
+        res.redirect("/profile");
     } else {
         // Check for duplicate email or name
         const existingUser = result.find(user => user.email === email || user.name === name);
@@ -138,7 +138,7 @@ app.post('/submitUser', async (req,res) => {
             req.session.cookie.maxAge = expireTime;
     
             //temp redirect till homepage complete.
-            res.redirect("/");
+            res.redirect("/profile");
         }}
 });
 
@@ -197,11 +197,11 @@ app.get('/loggedin', async (req, res) => {
         const user = await userCollection.findOne({ email: email }, { projection: { name: 1 } });
 
         if (user) {
-            // If user found, display the logged-in message along with the user's name
+            
             req.session.name = user.name;
             
             //temp redirect till homepage complete.
-            res.redirect("/")
+            res.redirect("/profile")
         } else {
             // If user not found, log out the user
             req.session.destroy();
