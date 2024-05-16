@@ -1,26 +1,31 @@
 <%-include('templates/header');%>
-    <!-- replace carousel with for loop that goes through all items in schedule 
-    loop would run 7 times, setting title to Monday, Tuesday, etc. and would 
-    get workout info from mongodb and paste it inside the right date-->
-
     <head>
         <style>
-            /* Custom CSS for horizontal scrolling */
+            /* Credit: ChatGPT
+            Helped create a hotizontal scrolling feature 
+            Custom CSS for horizontal scrolling */
             .scrolling-wrapper {
                 overflow-x: auto;
                 white-space: nowrap;
             }
+
             .card {
                 display: inline-block;
                 width: 150px;
                 height: 400px;
                 overflow-x: hidden;
                 /* Adjust as needed */
-                margin-right: 10px;
+                /*margin-right: 10px;*/
                 /* Adjust as needed */
             }
+
             li {
                 margin-left: -25px;
+            }
+
+            #newItem {
+                width: 130px;
+                margin-left: 15px;
             }
         </style>
     </head>
@@ -29,25 +34,29 @@
             <div class="col">
                 <h2>Weekly Workout Schedule</h2>
                 <div class="scrolling-wrapper">
-                    <% for (let i=0; i < workouts.work.length; i++) { %>
+                    <%  for (let day in workouts[0]) {
+                            if (workouts[0][day][0] == undefined) {
+                                continue;
+                            } 
+                            let currentDay = '' + day; %>
                         <div class="card">
                             <div class="card-body">
                                 <h5 class="card-title">
-                                    <%= workouts.work[i].date; %>
+                                    <%= currentDay; %>
                                 </h5>
                                 <ul>
-                                    <%for (let j=0; j < workouts.work[i].workoutList.length; j++) { %>
+                                    <% for (let j = 0; j < workouts[0][day].length; j++) { %>
                                         <li>
-                                            <%= //find a way to get length of string so you can add br tag appropriately
-                                                workouts.work[i].workoutList[j] %>
+                                            <%= workouts[0][day][j] %>
                                         </li>
                                     <% } %>
                                 </ul>
                             </div>
+                            <form action="/scheduleEditor/<%=currentDay%>" method="get">
+                                <button class="btn btn-outline-primary">Edit</button>
+                            </form>
                         </div>
                     <% } %>
-                    <!-- Cards -->
-                    <!-- Add more cards here -->
                 </div>
             </div>
         </div>
