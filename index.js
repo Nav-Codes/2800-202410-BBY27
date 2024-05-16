@@ -20,6 +20,7 @@ app.use('/exercises', express.static(path.join('exercises')));
 app.use(express.static(__dirname));
 app.use('/login', express.static(path.join(__dirname, '/public/js')));
 
+
 app.set('view engine', 'ejs');
 
 //port
@@ -427,6 +428,18 @@ app.get('/token/:token', function (req, res) {
 
 app.get('/goals', (req, res) => {
     res.render('goals');
+});
+
+app.post('/addgoal', async (req, res) => {
+    let quantity = req.body.quantity;
+    let unit = req.body.unit;
+    let goal = req.body.goal;
+
+    let goalArray = [];
+    goalArray.push(quantity, unit, goal);
+
+    userCollection.updateOne({email: req.session.email}, {$set: {goal: goalArray}});
+    return;
 });
 
 app.get('/exercise/:id', (req, res) => {
