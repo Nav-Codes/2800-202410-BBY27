@@ -77,6 +77,12 @@ app.use(session({
 }
 ));
 
+//Middleware to check if user is authenticated
+app.use(function(req, res, next) {
+    res.locals.authenticated = req.session.authenticated || false;
+    next();
+});
+
 app.get('/filtering/:filter', (req,res) => {
     res.redirect('/exercises/?filter=' + req.params.filter);
 });
@@ -255,7 +261,12 @@ const workouts = {
 };
 
 app.get('/schedule', (req, res) => {
-    res.render('schedule', {workouts});
+    if (!req.session.authenticated) {
+        res.redirect('/login');
+        return;
+    } else {
+        res.render('schedule', {workouts});
+    }
 });
 
 app.get('/goals', (req, res) => {
@@ -341,7 +352,12 @@ app.post('/search', async (req, res) => {
 });
 
 app.get('/ai', (req, res) => {
-    res.render('ai');
+    if (!req.session.authenticated) {
+        res.redirect('/login');
+        return;
+    } else {
+        res.render('ai');
+    }
 });
 
 app.post('/ai', async (req, res) => {
@@ -354,14 +370,82 @@ app.post('/ai', async (req, res) => {
     res.send(response['choices'][0]['message']['content'].trim()); 
 });
 
+// Function to select random exercises for the home page
+function getRandomExercises(exercises, count) {
+    const randomExercises = [];
+    const totalExercises = exercises.length;
+    const selectedIndices = new Set();
+
+    // Ensure that the count doesn't exceed the total number of exercises
+    count = Math.min(count, totalExercises);
+
+    // Select unique random indices
+    while (selectedIndices.size < count) {
+        const randomIndex = Math.floor(Math.random() * totalExercises);
+        if (!selectedIndices.has(randomIndex)) {
+            selectedIndices.add(randomIndex);
+            randomExercises.push(exercises[randomIndex]);
+        }
+    }
+
+    return randomExercises;
+}
+
 app.get('/', (req, res) => {
-    res.render('home');
+    if (req.session.authenticated) {
+        try {
+            // Read the JSON file
+            fs.readFile("./dist/exercises.json", 'utf8', (err, data) => {
+                if (err) {
+                    console.error('Error reading file:', err);
+                    res.status(500).send('Internal Server Error');
+                    return;
+                }
+    
+                let searchParam = "";
+    
+                // Parse the JSON data
+                let jsonData = JSON.parse(data);
+                if (req.query.search != null){
+                    jsonData = jsonData.filter(item => item.name.toLowerCase().includes(req.query.search));
+                    searchParam = req.query.search;
+                }
+    
+                let filter = req.query.filter || "";
+                if (filter){
+                    jsonData = jsonData.filter(item => item.level == req.query.filter);
+                }
+    
+                // Randomly select 3 exercises
+                const randomExercises = getRandomExercises(jsonData, 3);
+    
+                // Render the page with the random exercises
+                res.render('homeAuthenticated', {exercisesInfo: randomExercises});
+            });
+        } catch (error) {
+            // Handle error
+            console.error('Error:', error);
+            res.status(500).send('Internal Server Error');
+        }
+    } else {
+        res.render('homeUnauthenticated');
+    }
+});
+
+// Logout route
+app.get('/logout', (req, res) => {
+    req.session.destroy((err) => {
+        if (err) {
+            console.error('Error destroying session:', err);
+        }
+        res.redirect('/');
+    });
 });
  
 app.get("*", (req, res) => {
     console.log("404");
     res.status(404);
-    res.send("Page not found - 404");
+    res.render("404");
 });
 
 
