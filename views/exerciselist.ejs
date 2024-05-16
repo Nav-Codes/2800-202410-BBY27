@@ -1,87 +1,73 @@
 <%- include('./templates/header'); %>
 
 <div class="container">
-    <h1>Welcome</h1>
-    <div class="row">
-        <div class="col-md-4">
-            <form action="/createUser" method="get"> 
-                <button class="btn btn-primary" type="submit">Sign Up</button> 
-            </form>
-        </div>
-        <div class="col-md-4">
-            <form action="/login" method="get">
-                <button class="btn btn-primary" type="submit">Login</button>
-            </form>
-        </div>
-        <div class="col-md-4">
-            <form action="/search" method="post" class="d-flex">
-                <div class="dropdown me-2">
-                    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        Difficulty
-                    </button>
-                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                        <a class="dropdown-item" href="/filtering/beginner">Beginner</a>
-                        <a class="dropdown-item" href="/filtering/intermediate">Intermediate</a>
-                        <a class="dropdown-item" href="/filtering/expert">Expert</a>
+    <div class="col-md-4">
+        <form action="/search" method="post" class="d-flex">
+            <div class="dropdown me-2">
+                <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Difficulty
+                </button>
+                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                    <a class="dropdown-item" href="/filtering/beginner">Beginner</a>
+                    <a class="dropdown-item" href="/filtering/intermediate">Intermediate</a>
+                    <a class="dropdown-item" href="/filtering/expert">Expert</a>
+                </div>
+            </div>
+            <input name="search" id="searchbar" class="form-control me-2"
+                type="search" placeholder="Search" aria-label="Search" value="<%= searchParam %>">
+                <input type="hidden" name="filter" value="<%= filter %>">
+            <button class="btn btn-primary" type="submit">Submit</button>
+        </form>
+    </div>
+</div>
+
+<h1>Exercises:</h1>
+<nav aria-label="Page navigation">
+    <ul class="pagination justify-content-center">
+        <li class="page-item <%= currentPage === 1 ? 'disabled' : '' %>">
+            <a class="page-link" href="?filter=<%= filter %>&search=<%= searchParam %>&page=1" tabindex="-1" aria-disabled="true">First</a>
+        </li>
+        <% for(let page = Math.max(1, currentPage - 2); page <= Math.min(totalPages, currentPage + 2); page++) { %>
+            <li class="page-item <%= page === currentPage ? 'active' : '' %>">
+                <a class="page-link" href="?filter=<%= filter %>&search=<%= searchParam %>&page=<%= page %>"><%= page %></a>
+            </li>
+        <% } %>
+        <li class="page-item <%= currentPage === totalPages ? 'disabled' : '' %>">
+            <a class="page-link" href="?filter=<%= filter %>&search=<%= searchParam %>&page=<%= totalPages %>" tabindex="-1" aria-disabled="true">Last</a>
+        </li>
+    </ul>
+</nav>
+    
+<ul class="list-unstyled">
+    <% exercisesInfo.forEach(exercise => { %>
+        <li id="<%= exercise.name %>" class="mb-3 text-center">
+            <a href="/exercise/<%= exercise.id %>" class="text-decoration-none">
+                <div class="card">
+                    <div class="card-body">
+                        <h3 class="card-title"><%= exercise.name %></h3>
+                        <img src="/exercises/<%= exercise.images[0] %>" alt="<%= exercise.name %>" class="img-fluid mb-2">
+                        <p class="card-text">Muscles: <%= exercise.primaryMuscles[0].charAt(0).toUpperCase() + exercise.primaryMuscles[0].slice(1) %><br>Difficulty: <%=exercise.level.charAt(0).toUpperCase() + exercise.level.slice(1) %></p>
                     </div>
                 </div>
-                <input name="search" id="searchbar" class="form-control me-2"
-                    type="search" placeholder="Search" aria-label="Search" value="<%= searchParam %>">
-                    <input type="hidden" name="filter" value="<%= filter %>">
-                <button class="btn btn-primary" type="submit">Submit</button>
-            </form>
-        </div>
-    </div>
+            </a>
+        </li>
+    <% }); %>
+</ul>
 
-    <h1>Exercises:</h1>
-
-    <nav aria-label="Page navigation">
-        <ul class="pagination justify-content-center">
-            <li class="page-item <%= currentPage === 1 ? 'disabled' : '' %>">
-                <a class="page-link" href="?filter=<%= filter %>&search=<%= searchParam %>&page=1" tabindex="-1" aria-disabled="true">First</a>
+<nav aria-label="Page navigation">
+    <ul class="pagination justify-content-center">
+        <li class="page-item <%= currentPage === 1 ? 'disabled' : '' %>">
+            <a class="page-link" href="?filter=<%= filter %>&search=<%= searchParam %>&page=1" tabindex="-1" aria-disabled="true">First</a>
+        </li>
+        <% for(let page = Math.max(1, currentPage - 2); page <= Math.min(totalPages, currentPage + 2); page++) { %>
+            <li class="page-item <%= page === currentPage ? 'active' : '' %>">
+                <a class="page-link" href="?filter=<%= filter %>&search=<%= searchParam %>&page=<%= page %>"><%= page %></a>
             </li>
-            <% for(let page = Math.max(1, currentPage - 2); page <= Math.min(totalPages, currentPage + 2); page++) { %>
-                <li class="page-item <%= page === currentPage ? 'active' : '' %>">
-                    <a class="page-link" href="?filter=<%= filter %>&search=<%= searchParam %>&page=<%= page %>"><%= page %></a>
-                </li>
-            <% } %>
-            <li class="page-item <%= currentPage === totalPages ? 'disabled' : '' %>">
-                <a class="page-link" href="?filter=<%= filter %>&search=<%= searchParam %>&page=<%= totalPages %>" tabindex="-1" aria-disabled="true">Last</a>
-            </li>
-        </ul>
-    </nav>
-    
-    <ul class="list-unstyled">
-        <% exercisesInfo.forEach(exercise => { %>
-            <li id="<%= exercise.name %>" class="mb-3 text-center">
-                <a href="/exercise/<%= exercise.id %>" class="text-decoration-none">
-                    <div class="card">
-                        <div class="card-body">
-                            <h3 class="card-title"><%= exercise.name %></h3>
-                            <img src="/exercises/<%= exercise.images[0] %>" alt="<%= exercise.name %>" class="img-fluid mb-2">
-                            <p class="card-text">Muscles: <%= exercise.primaryMuscles[0].charAt(0).toUpperCase() + exercise.primaryMuscles[0].slice(1) %><br>Difficulty: <%=exercise.level.charAt(0).toUpperCase() + exercise.level.slice(1) %></p>
-                        </div>
-                    </div>
-                </a>
-            </li>
-        <% }); %>
+        <% } %>
+        <li class="page-item <%= currentPage === totalPages ? 'disabled' : '' %>">
+            <a class="page-link" href="?filter=<%= filter %>&search=<%= searchParam %>&page=<%= totalPages %>" tabindex="-1" aria-disabled="true">Last</a>
+        </li>
     </ul>
-
-    <nav aria-label="Page navigation">
-        <ul class="pagination justify-content-center">
-            <li class="page-item <%= currentPage === 1 ? 'disabled' : '' %>">
-                <a class="page-link" href="?filter=<%= filter %>&search=<%= searchParam %>&page=1" tabindex="-1" aria-disabled="true">First</a>
-            </li>
-            <% for(let page = Math.max(1, currentPage - 2); page <= Math.min(totalPages, currentPage + 2); page++) { %>
-                <li class="page-item <%= page === currentPage ? 'active' : '' %>">
-                    <a class="page-link" href="?filter=<%= filter %>&search=<%= searchParam %>&page=<%= page %>"><%= page %></a>
-                </li>
-            <% } %>
-            <li class="page-item <%= currentPage === totalPages ? 'disabled' : '' %>">
-                <a class="page-link" href="?filter=<%= filter %>&search=<%= searchParam %>&page=<%= totalPages %>" tabindex="-1" aria-disabled="true">Last</a>
-            </li>
-        </ul>
-    </nav>
-</div>
+</nav>
 
 <%- include('./templates/footer'); %>
