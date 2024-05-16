@@ -77,6 +77,12 @@ app.use(session({
 }
 ));
 
+//Middleware to check if user is authenticated
+app.use(function(req, res, next) {
+    res.locals.authenticated = req.session.authenticated || false;
+    next();
+});
+
 app.get('/filtering/:filter', (req,res) => {
     res.redirect('/exercises/?filter=' + req.params.filter);
 });
