@@ -1,18 +1,15 @@
 <%-include('templates/header');%>
+    <p>Current Exercises in list: </p>
     <%  //import the database array and store it as a local array to be added/deleted to 
-        //could update database in real time 
-        //when removing from list, 
-    var exercises; 
-    for (let day in workouts[0]) {
-        exercises = workouts[0][day];
+    var exercises = workouts[0][day]; //represents the exercises currently in schedule
         for (let j = 0; j < workouts[0][day].length; j++) { %>
             <li>
                 <%= workouts[0][day][j] %>
             </li>
         <% }
-        } %>
+    %>
         <br>
-
+        <h1 id="dayOfWeek" value="<%= day %>"><%= day %></h1>
         <!-- will need to create new post method for this in index.js
             <div class="col-md-4">
             <form action="/scheduleEditor" method="post" class="d-flex">
@@ -40,10 +37,8 @@
                 <a href="/exercise/<%= exercise.id %>" class="text-decoration-none">
                     <div class="card">
                         <div class="card-body">
-                            <!-- compare this workout to all workouts in local array and if match found, set check to true 
-                                use name= "selectedWorkout" to do req.body stuff -->
                             <!-- Credit: ChatGPT - helped with checkmarking workouts that are already in your workout list -->
-                            <input type="checkbox" <%= exercises.includes(exercise.name) ? 'checked' : '' %>>
+                            <input type="checkbox" <%= exercises.includes(exercise.name) ? 'checked' : '' %> class="selectedWorkout" id="<%=exercise.name%>" name="work" value="<%=exercise.name%>">
                             <h5 class="card-title"><%= exercise.name %></h5>
                             <p class="card-text">Muscles: <%= exercise.primaryMuscles[0].charAt(0).toUpperCase() + exercise.primaryMuscles[0].slice(1) %><br>Difficulty: <%=exercise.level.charAt(0).toUpperCase() + exercise.level.slice(1) %></p>
                         </div>
@@ -69,10 +64,51 @@
             </li>
         </ul>
     </nav>
-    <form action="/scheduleSave">
-        <button type="button" name="btn button-success">Save</button>
+    <form action="/schedule" method="get">
+        <button class="btn button-success" id="saveButton">Save</button>
     </form>
     <button type="button" class="btn button-outline-light">
         <a href="/schedule">Cancel</a>
     </button>
+    <script>
+        //ajax function to send data from client to server
+        function ajaxPOST(url, data, callback) {
+            let xhr = new XMLHttpRequest();
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === XMLHttpRequest.DONE) {
+                    if (xhr.status === 200) {
+                        callback(xhr.responseText);
+                    } else {
+                        console.error('Error:', xhr.status);
+                    }
+                }
+            };
+            xhr.open("POST", url, true);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.send(JSON.stringify(data));
+        }
+        let worky = Array.from(document.querySelectorAll('input[name="work"]:checked')).map(input => input.value);
+        
+        //place event listener out here and call function when the checkbox is pressed
+        var checkbox = document.querySelectorAll(".selectedWorkout").forEach(function(currentElement, currentIndex, listObj) {
+            currentElement.addEventListener("click", function(e) {
+                for (let i = 0; i < this.parentNode.childNodes.length; i++) {
+                    if (this.parentNode.childNodes[i].nodeType == Node.ELEMENT_NODE) {
+                        // console.log(this.parentNode.childNodes[i].checked); //can check whether the checkbox is on or off like so
+                        //Credit: ChatGPT - create an array based on the values of the checkboxes
+                        worky = Array.from(document.querySelectorAll('input[name="work"]:checked')).map(input => input.value);
+                    }
+                }
+            })
+        });
+
+        //gets the current day; used to specify which day to update
+        var myDay = document.getElementById('dayOfWeek').innerHTML;
+        document.getElementById("saveButton").addEventListener("click", function(e){
+            if (worky.length == 0) {
+                worky.push('No workouts');
+            }
+            ajaxPOST('/scheduleSave', {newSched: worky, day : myDay}, (val) => {console.log(val)});
+        });
+    </script>
 <%-include('templates/footer');%>

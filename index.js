@@ -15,7 +15,6 @@ app.use(express.urlencoded({extended: false}));
 
 // Serve static files from the dist/exercises directory
 app.use('/exercises', express.static(path.join('exercises')));
-app.use('/scripts', express.static(path.join('scripts')));
 
 app.set('view engine', 'ejs');
 
@@ -49,7 +48,9 @@ app.use(bodyParser.json());
 const bcrypt = require('bcrypt');
 
 const Joi = require("joi");
+const { scheduler } = require("timers/promises");
 
+//collections in database
 var {database} = include('databaseConnection.js');
 const userCollection = database.db(process.env.MONGODB_DATABASE).collection(process.env.MONGODB_COLLECTION);
 const scheduleCollection = database.db(process.env.MONGODB_DATABASE).collection(process.env.MONGODB_COLLECTION_SCHEDULE);
@@ -91,13 +92,13 @@ app.get('/createUser', (req,res) => {
 function createSchedule(email) {
     scheduleCollection.insertOne({
         email : email, 
-        Sunday : ['rest'],
-        Monday : ['bicep curls', 'tricep rows'],
-        Tuesday : ['lunges', 'sqauts'],
-        Wednesday : ['rest'],
-        Thursday : ['back pull', 'bench press'],
-        Friday : ['pushups', 'pull ups'],
-        Saturday : ['active rest'],
+        Sunday : ['No workouts'],
+        Monday : ['No workouts'],
+        Tuesday : ['No workouts'],
+        Wednesday : ['No workouts'],
+        Thursday : ['No workouts'],
+        Friday : ['No workouts'],
+        Saturday : ['No workouts'],
     });
     console.log('created empty schedule');
 }
@@ -267,6 +268,8 @@ app.get('/scheduleEditor/:day', async (req, res) => {
         .find({ email: req.session.email })
         .project(projection)
         .toArray();
+    
+    var day = req.params.day;
 
         try {
             // Read the JSON file
@@ -305,24 +308,29 @@ app.get('/scheduleEditor/:day', async (req, res) => {
                 const exercisesInfo = jsonData.slice(startIndex, endIndex);
     
                 // Send the list of exercises for the current page as response
-                res.render('scheduleEditor', {workouts, searchParam, exercisesInfo, currentPage, filter, totalPages});
+            res.render('scheduleEditor', {workouts, searchParam, exercisesInfo, currentPage, filter, totalPages, day});
             });
         } catch (error) {
             // Handle error
             console.error('Error:', error);
             res.status(500).send('Internal Server Error');
         }
-    
-    //number of page buttons: max 5, min 3
-    //number of workouts: 20 without the pictures
-
-    // res.render('scheduleEditor', {workouts});
 });
 
-app.post('/scheduleSave', (req, res) => {
-    //update database here
+app.post('/scheduleSave', async (req, res) => {    
+    let workoutArray = req.body.newSched;
+    let day = req.body.day;
+    console.log(workoutArray);
+    console.log(day);
 
-    res.redirect('/schedule');
+    //update the database
+    await scheduleCollection.updateOne({email : req.session.email}, {$set : {[day] : workoutArray}})
+});
+
+app.get('/token/:token', function (req, res) {
+    const token = req.params.token
+    console.log(`token is ${token}`)
+    res.status(200).send(`token is ${token}`)
 });
 
 app.get('/goals', (req, res) => {
