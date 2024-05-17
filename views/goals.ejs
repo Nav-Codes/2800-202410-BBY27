@@ -38,22 +38,31 @@
 
 <div class="list-group me-3 mt-3">
   <% if (result && result.goal && result.goal.length > 0) { %>
-      <% result.goal.forEach((item, index) => { %>
-          <label class="list-group-item">
-            <form id="deleteGoalForm<%= index %>" action="/deletegoal" method="post">
-              <input type="hidden" name="goalIndex" value="<%= index %>">
-              <button type="submit" class="close" aria-label="Close">
-                  <span aria-hidden="true">&times;</span>
-              </button>
-              <strong>Goal <%= index + 1 %>:</strong>
-              Quantity: <%= item[0] %>, Unit Type: <%= item[1] %>, Goal: <%= item[2] %>
-            </form>
-          </label>
-      <% }); %>
+    <% result.goal.forEach((item, index) => { %>
+      <label class="list-group-item">
+        <form id="deleteGoalForm<%= index %>" action="/deletegoal" method="post">
+          <input type="hidden" name="goalIndex" value="<%= index %>">
+          <button type="submit" class="close" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+          <strong>Goal <%= index + 1 %>:</strong>
+          Quantity: <%= item[0] %>, Unit Type: <%= item[1] %>, Goal: <%= item[2] %>
+        </form>
+        <!-- Contribute Button -->
+    <label class="list-group-item">
+      <form id="contributeForm" action="/contribute" method="post">
+        <input type="hidden" name="goalIndex" value="<%= index %>">
+        <input name="quantity" type="text" class="form-control" id="quantity" placeholder="Amount Complete" required>
+        <button type="submit" class="btn btn-primary">Contribute</button>
+      </form>
+    </label>
+      </label>
+    <% }); %>
   <% } else { %>
-      <label class="list-group-item">No goals found.</label>
+    <label class="list-group-item">No goals found.</label>
   <% } %>
 </div>
+
 
 
 <%- include('templates/footer'); %>
