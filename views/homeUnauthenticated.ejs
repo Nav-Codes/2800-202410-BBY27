@@ -1,0 +1,40 @@
+<%- include("templates/header") %>
+
+<style>
+    .button {
+        display: inline-block;
+        padding: 15px 30px;
+        border-radius: 5px;
+        text-decoration: none;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    .button.signup {
+        background-color: #EBB0D7;
+        color: black;
+    }
+
+    .button.login {
+        background-color: #A8EEE1;
+        color: black;
+    }
+
+    .button:hover {
+        background-color: #ccc;
+    }
+
+    /* Add more styles as needed */
+
+</style>
+
+<div class="grid-container">
+    <div class="grid-item1">
+        <a href="/createUser" class="button signup">Sign Up</a>
+    </div>
+    <div class="grid-item2">
+        <a href="/login" class="button login">Login</a>
+    </div>
+</div>

@@ -1,34 +1,51 @@
 <%- include("templates/header"); %>
 
-<div style="display: flex; justify-content: center; 
-align-items: center; flex-direction: column; border-color: black; border-style: solid;
-border-width: 5%;">
+<div style="display: flex; justify-content: center; align-items: center; flex-direction: column; border-color: black; border-style: solid; border-width: 5%;">
 
-<% if (error.userNoExist === 1) { %>
-    <h3 style='color:red'>User Does Not Exist</h3>
-    <h3 style="color: red;">Please Input Different User</h3>
-  <% } else if (error.EmailNotEnt === 1) { %>
-    <h3 style='color:red'>Please Enter a Valid Email</h3>
-  <% } else if (error.Wrong === 1) { %>
-    <h3 style='color:red'>Incorrect Email or Password</h3>
-  <% } %>
+    <% if (error.userNoExist === 1) { %>
+        <h3 style='color:red'>User Does Not Exist</h3>
+        <h3 style="color: red;">Please Input Different User</h3>
+    <% } else if (error.EmailNotEnt === 1) { %>
+        <h3 style='color:red'>Please Enter a Valid Email</h3>
+    <% } else if (error.Wrong === 1) { %>
+        <h3 style='color:red'>Incorrect Email or Password</h3>
+    <% } %>
 
-<form action="/loggingin" method="post" style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
-    <div class="form-group">
-      <div class="form-group" style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
-        <label for="exampleInputEmail1">Email address</label>
-        <input name="email" type="email" class="form-control" 
-        id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter email">
-      </div>
-      <div class="form-group" style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
-        <label for="exampleInputPassword1">Password</label>
-        <input name="password" type="password" 
-        class="form-control" id="exampleInputPassword1" placeholder="Password">
-      </div>
-      <div class="form-group" style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
-      <button type="submit">Log In</button>
+    <form action="/loggingin" method="post" style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
+        <div class="form-group">
+            <div class="form-group" style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
+                <label for="exampleInputEmail1">Email address</label>
+                <input name="email" type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter email">
+            </div>
+            <div class="form-group" style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
+                <label for="exampleInputPassword1">Password</label>
+                <input name="password" type="password" class="form-control" id="exampleInputPassword1" placeholder="Password">
+            </div>
+            <div class="form-group" style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
+                <button type="submit">Log In</button>
+            </div>
+        </div>
+    </form>
+
+    <!-- Button to trigger forgot password modal -->
+    <button type="button" class="btn btn-primary" onclick="openForgotPasswordModal()">Forgot Password?</button>
+
+    <!-- Modal -->
+    <div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="loginModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="loginModalLabel">Forgot Password</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" id="testmodal">
+                    <!-- Placeholder for dynamic content -->
+                </div>
+            </div>
+        </div>
     </div>
-  </form>
 </div>
-
+<script src="../public/js/accountRetrieval.js"></script>
 <%- include("templates/footer"); %>

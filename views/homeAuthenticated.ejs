@@ -1,0 +1,59 @@
+<%-include('templates/header');%>
+
+<style>
+    .rectangle {
+    height: auto;
+    width: 70vw;
+    border-radius: 10px;
+    margin: 0 auto;
+    text-align: center;
+    padding: 10px;
+    font-size: xx-large;
+    margin-bottom: 20px;
+    margin-top: 20px;
+    }
+
+    .box-shadow-3d{
+    box-shadow: 1px 1px 0px #999,
+                2px 2px 0px #999,
+                3px 3px 0px #999,
+                4px 4px 0px #999,
+                5px 5px 0px #999,
+                6px 6px 0px #999;
+    }
+
+    .rectangle:hover {
+        box-shadow: none;
+    }
+</style>
+
+<a href="/goals">
+    <div class="rectangle box-shadow-3d" style="background-color: #EBB0D7; color: black; text-decoration: none;">Goals</div>
+</a>
+
+<a href="/schedule">
+    <div class="rectangle box-shadow-3d" style="background-color: #A8EEE1; color: black; text-decoration: none;">Workout Plan</div>
+</a>
+
+<a href="/exercises">
+    <div class="rectangle box-shadow-3d" style="background-color: #A8EEB3; color: black; text-decoration: none;">Exercises For You
+        <br><br>
+        <ul class="list-unstyled">
+            <% exercisesInfo.forEach(exercise => { %>
+                <li id="<%= exercise.name %>" class="mb-3 text-center">
+                    <a href="/exercise/<%= exercise.id %>" class="text-decoration-none">
+                        <div class="card" style="background-color: #8BD897; color: black; text-decoration: none;">
+                            <div class="card-body">
+                                <h3 class="card-title"><%= exercise.name %></h3>
+                                <img src="/exercises/<%= exercise.images[0] %>" alt="<%= exercise.name %>" class="img-fluid mb-2">
+                                <p class="card-text">Muscles: <%= exercise.primaryMuscles[0].charAt(0).toUpperCase() + exercise.primaryMuscles[0].slice(1) %><br>Difficulty: <%= exercise.level.charAt(0).toUpperCase() + exercise.level.slice(1) %></p>
+                            </div>
+                        </div>
+                    </a>
+                </li>
+            <% }); %>
+        </ul>
+    </div>
+</a>
+
+<%-include('templates/footer');%>
