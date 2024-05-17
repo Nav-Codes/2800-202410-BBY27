@@ -40,13 +40,20 @@
   <% if (result && result.goal && result.goal.length > 0) { %>
       <% result.goal.forEach((item, index) => { %>
           <label class="list-group-item">
+            <form id="deleteGoalForm<%= index %>" action="/deletegoal" method="post">
+              <input type="hidden" name="goalIndex" value="<%= index %>">
+              <button type="submit" class="close" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+              </button>
               <strong>Goal <%= index + 1 %>:</strong>
               Quantity: <%= item[0] %>, Unit Type: <%= item[1] %>, Goal: <%= item[2] %>
+            </form>
           </label>
       <% }); %>
   <% } else { %>
       <label class="list-group-item">No goals found.</label>
   <% } %>
 </div>
+
 
 <%- include('templates/footer'); %>

@@ -448,6 +448,29 @@ app.post('/addgoal', async (req, res) => {
     res.redirect('/goals');
 });
 
+app.post('/deletegoal', async (req, res) => {
+    const index = req.body.goalIndex; // Get the index from the request body
+
+    try {
+        // Use positional operator $ and $unset to remove the goal at the specified index
+        await userCollection.updateOne(
+            { email: req.session.email },
+            { $unset: { [`goal.${index}`]: 1 } }
+        );
+        // Use $pull to remove null values left after using $unset
+        await userCollection.updateOne(
+            { email: req.session.email },
+            { $pull: { goal: null } }
+        );
+        res.redirect('/goals'); // Redirect to the goals page after deletion
+    } catch (error) {
+        console.error('Error deleting goal:', error);
+        res.status(500).send('Error deleting goal'); // Send error response if deletion fails
+    }
+});
+
+
+
 app.get('/exercise/:id', (req, res) => {
     try {
         // Read the JSON file
