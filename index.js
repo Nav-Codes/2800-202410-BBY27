@@ -177,8 +177,12 @@ app.post('/submitUser', async (req,res) => {
         }}
 });
 
-app.get('/resetpassword/:token', (req, res) =>{
+app.get('/resetpassword/:token', async (req, res) =>{
     token = req.params.token;
+    if (!await userCollection.findOne({resetToken: token})){
+        res.redirect('/login');
+        return;
+    }
     res.render('passwordReset', {token});
 });
 
