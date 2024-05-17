@@ -409,6 +409,12 @@ app.get('/scheduleEditor/:day', async (req, res) => {
         }
 });
 
+app.post('/scheduleSearch/:day', async (req, res) => {
+    let search = req.body.search;
+    let day = req.params.day;
+    res.redirect("/scheduleEditor/" + day + "?search=" + search);
+});
+
 app.post('/scheduleSave', async (req, res) => {    
     let workoutArray = req.body.newSched;
     let day = req.body.day;
@@ -416,13 +422,8 @@ app.post('/scheduleSave', async (req, res) => {
     console.log(day);
 
     //update the database
-    await scheduleCollection.updateOne({email : req.session.email}, {$set : {[day] : workoutArray}})
-});
-
-app.get('/token/:token', function (req, res) {
-    const token = req.params.token
-    console.log(`token is ${token}`)
-    res.status(200).send(`token is ${token}`)
+    await scheduleCollection.updateOne({email : req.session.email}, {$set : {[day] : workoutArray}});
+    res.redirect('schedule');
 });
 
 app.get('/goals', (req, res) => {

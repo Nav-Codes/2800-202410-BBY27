@@ -19,8 +19,8 @@
                 /* Adjust as needed */
             }
 
-            li {
-                margin-left: -25px;
+            .workoutList {
+                margin-left: -35px;
             }
 
             #newItem {
@@ -46,7 +46,7 @@
                                 </h5>
                                 <ul>
                                     <% for (let j = 0; j < workouts[0][day].length; j++) { %>
-                                        <li>
+                                        <li class="workoutList">
                                             <%= workouts[0][day][j] %>
                                         </li>
                                     <% } %>
