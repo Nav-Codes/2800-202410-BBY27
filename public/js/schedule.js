@@ -24,7 +24,6 @@ var checkbox = document.querySelectorAll(".selectedWorkout").forEach(function(cu
                 // console.log(this.parentNode.childNodes[i].checked); //can check whether the checkbox is on or off like so
                 //Credit: ChatGPT - create an array based on the values of the checkboxes
                 worky = Array.from(document.querySelectorAll('input[name="work"]:checked')).map(input => input.value);
-                console.log(worky);
             }
         }
     })
