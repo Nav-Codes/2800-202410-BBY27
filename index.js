@@ -20,6 +20,7 @@ app.use('/exercises', express.static(path.join('exercises')));
 app.use(express.static(__dirname));
 app.use('/login', express.static(path.join(__dirname, '/public/js')));
 
+
 app.set('view engine', 'ejs');
 
 //port
@@ -426,9 +427,74 @@ app.post('/scheduleSave', async (req, res) => {
     res.redirect('schedule');
 });
 
-app.get('/goals', (req, res) => {
-    res.render('goals');
+app.get('/goals', async (req, res) => {
+    if (!req.session.authenticated) {
+        res.redirect('/login');
+    }
+    const result = await userCollection.findOne({ email: req.session.email });
+    console.log(result);
+    res.render('goals', { result });
 });
+
+
+app.post('/addgoal', async (req, res) => {
+    let quantity = req.body.quantity;
+    let unit = req.body.unit;
+    let goal = req.body.goal;
+
+    let goalArray = [];
+    goalArray.push(quantity, unit, goal, 0);
+
+    userCollection.updateOne({email: req.session.email}, {$push: {goal: goalArray}});
+    res.redirect('/goals');
+});
+
+app.post('/deletegoal', async (req, res) => {
+    const index = req.body.goalIndex; // Get the index from the request body
+    try {
+        // Use positional operator $ and $unset to remove the goal at the specified index
+        await userCollection.updateOne(
+            { email: req.session.email },
+            { $unset: { [`goal.${index}`]: 1 } }
+        );
+        // Use $pull to remove null values left after using $unset
+        await userCollection.updateOne(
+            { email: req.session.email },
+            { $pull: { goal: null } }
+        );
+        res.redirect('/goals'); // Redirect to the goals page after deletion
+    } catch (error) {
+        console.error('Error deleting goal:', error);
+        res.status(500).send('Error deleting goal'); // Send error response if deletion fails
+    }
+});
+
+app.post('/contribute', async (req, res) => {
+    const quantity = parseFloat(req.body.quantity); // Parse quantity as float
+    const index = req.body.goalIndex; // Get the index from the request body
+
+    // Retrieve the current value of the specified element of the goal array
+    const user = await userCollection.findOne({ email: req.session.email });
+
+    if (user && user.goal && user.goal[index]) {
+        let currentGoalValue = user.goal[index][3]; // Assuming the specified element is an array with one item
+
+        if (typeof currentGoalValue === 'number') {
+            // Add the quantity to the current value
+            const newValue = currentGoalValue + quantity;
+
+            // Update the specified element of the goal array with the new value
+            await userCollection.updateOne(
+                { email: req.session.email },
+                { $set: { [`goal.${index}.3`]: newValue } } // Assuming the specified element is an array with one item
+            );
+        }
+    }
+
+    res.redirect('/goals');
+});
+
+
 
 app.get('/exercise/:id', (req, res) => {
     try {
