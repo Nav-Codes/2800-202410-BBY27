@@ -354,7 +354,12 @@ app.get('/schedule', async (req, res) => {
 });
 
 app.get('/scheduleEditor/:day', async (req, res) => {
-    //gets workout schedule based on unique email    
+    //gets workout schedule based on unique email  
+    
+    if (!req.session.authenticated) {
+        res.redirect('/login');
+        return;
+    }
     
     //Credit: ChatGPT
     //This creates a projection object that references a property of an object
