@@ -623,8 +623,17 @@ function getRandomExercises(exercises, count) {
     return randomExercises;
 }
 
-app.get('/', (req, res) => {
+app.get('/', async (req, res) => {
     if (req.session.authenticated) {
+        //Credit: w3schools - create an array with all week day names, 
+        //use date object to get current day, and use number returned to access day from array
+        const weekday = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+        const d = new Date();
+        let today = weekday[d.getDay()]
+        let todaysWorkouts = await scheduleCollection
+        .find({email: req.session.email})
+        .project({[today]: 1})
+        .toArray();
         try {
             // Read the JSON file
             fs.readFile("./dist/exercises.json", 'utf8', (err, data) => {
@@ -650,9 +659,20 @@ app.get('/', (req, res) => {
     
                 // Randomly select 3 exercises
                 const randomExercises = getRandomExercises(jsonData, 3);
-    
-                // Render the page with the random exercises
-                res.render('homeAuthenticated', {exercisesInfo: randomExercises});
+
+                //get the id's of the current days workouts
+                let workoutIDs = [];
+
+                for (let i = 0; i < todaysWorkouts[0][today].length; i++) {
+                    for (let j = 0; j < jsonData.length; j++) {
+                        if (todaysWorkouts[0][today][i] == jsonData[j].name) {
+                            workoutIDs.push(jsonData[j]);
+                            break;
+                        }
+                    }
+                }    
+                // Render the page with the random exercises and todays exercises
+                res.render('homeAuthenticated', {exercisesInfo: randomExercises, workoutNames: todaysWorkouts, workoutIDs: workoutIDs, currentDay: today});
             });
         } catch (error) {
             // Handle error
