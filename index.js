@@ -210,14 +210,15 @@ app.post('/forgotpassword', async (req, res) => {
           pass: 'ghcjcvmhksrcxpqp '
         }
       });
-    
+      const host = req.get('host');
+      const resetLink = `http://${host}/resetpassword/${hash}`;
     try {
         await transporter.sendMail({
             from: 'wefitpass@gmail.com',
             to: email,
             subject: 'AccountInfo',
-            text: 'link: http://localhost:3000/resetpassword/' + hash
-        });
+            text: `link: ${resetLink}`
+            });
 
         res.json({status:"success", message:"Thank you for submitting your request. If a valid email was used, an email will be sent to that account. Please check your inbox for further information."});
     } catch (error) {
