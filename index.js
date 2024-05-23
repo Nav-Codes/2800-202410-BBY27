@@ -398,6 +398,9 @@ app.get('/scheduleEditor/:day', async (req, res) => {
 
                 // Parse the JSON data
                 let jsonData = JSON.parse(data);
+                
+                let workoutData = jsonData;
+
                 if (req.query.search != null) {
                     jsonData = jsonData.filter(item => item.name.toLowerCase().includes(req.query.search));
                     searchParam = req.query.search;
@@ -411,9 +414,9 @@ app.get('/scheduleEditor/:day', async (req, res) => {
                 //get ids of workouts for given day
                 let workoutIDs = [];
                 for (let i = 0; i < workouts[0][day].length; i++) {
-                    for (let j = 0; j < jsonData.length; j++) {
-                        if (workouts[0][day][i] == jsonData[j].name) {
-                            workoutIDs.push(jsonData[j]);
+                    for (let j = 0; j < workoutData.length; j++) {
+                        if (workouts[0][day][i] == workoutData[j].name) {
+                            workoutIDs.push(workoutData[j]);
                             break;
                         }
                     }

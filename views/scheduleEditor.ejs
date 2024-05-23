@@ -23,7 +23,11 @@
         <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
             <ul class="list-group">
             <% var exercises = workouts[0][day]; //represents the exercises currently in schedule
-                for (let j = 0; j < workouts[0][day].length; j++) { %>
+                for (let j = 0; j < workouts[0][day].length; j++) { 
+                    if (workoutIDs.length == 0) { %>
+                        <p>No workouts</p>
+                        <% break;
+                    } %>
                     <a style="font-size:large;" href="/exercise/<%= workoutIDs[j].id %>"><%= workouts[0][day][j] %></a>
             <% } %>
         </ul>
