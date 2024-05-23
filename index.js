@@ -363,23 +363,27 @@ app.get('/schedule', async (req, res) => {
 
 app.get('/scheduleEditor/:day', async (req, res) => {
     //gets workout schedule based on unique email  
-    
+
     if (!req.session.authenticated) {
         res.redirect('/login');
         return;
     }
-    
-    //Credit: ChatGPT
-    //This creates a projection object that references a property of an object
-    const projection = {};
-    projection[req.params.day] = 1;
-
-    const workouts = await scheduleCollection
-        .find({ email: req.session.email })
-        .project(projection)
-        .toArray();
-    
     var day = req.params.day;
+    let gotActualDay = false;
+
+    const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+    for (let i = 0; i < daysOfWeek.length; i++) {
+        if (daysOfWeek[i] == day) {
+            gotActualDay = true;
+            break;
+        }
+    }
+
+    if (gotActualDay) {
+        const workouts = await scheduleCollection
+            .find({ email: req.session.email })
+            .project({ [day]: 1 })
+            .toArray();
 
         try {
             // Read the JSON file
@@ -389,42 +393,54 @@ app.get('/scheduleEditor/:day', async (req, res) => {
                     res.status(500).send('Internal Server Error');
                     return;
                 }
-    
+
                 let searchParam = "";
-    
+
                 // Parse the JSON data
                 let jsonData = JSON.parse(data);
-                if (req.query.search != null){
+                if (req.query.search != null) {
                     jsonData = jsonData.filter(item => item.name.toLowerCase().includes(req.query.search));
                     searchParam = req.query.search;
                 }
-    
+
                 let filter = req.query.filter || "";
-                if (filter){
+                if (filter) {
                     jsonData = jsonData.filter(item => item.level == req.query.filter);
                 }
-    
+
+                //get ids of workouts for given day
+                let workoutIDs = [];
+                for (let i = 0; i < workouts[0][day].length; i++) {
+                    for (let j = 0; j < jsonData.length; j++) {
+                        if (workouts[0][day][i] == jsonData[j].name) {
+                            workoutIDs.push(jsonData[j]);
+                            break;
+                        }
+                    }
+                }
+
                 // Calculate pagination parameters
                 const pageSize = 20; // Number of exercises per page
                 const totalPages = Math.ceil(jsonData.length / pageSize);
                 let currentPage = parseInt(req.query.page) || 1; // Default to page 1 if not specified
                 currentPage = Math.min(Math.max(currentPage, 1), totalPages); // Ensure current page is within valid range
-    
+
                 // Calculate the start and end indices of exercises for the current page
                 const startIndex = (currentPage - 1) * pageSize;
                 const endIndex = Math.min(startIndex + pageSize, jsonData.length);
-    
+
                 // Extract names, images, and descriptions from the JSON data for the current page
                 const exercisesInfo = jsonData.slice(startIndex, endIndex);
-    
+
                 // Send the list of exercises for the current page as response
-            res.render('scheduleEditor', {workouts, searchParam, exercisesInfo, currentPage, filter, totalPages, day});
+                res.render('scheduleEditor', { workouts, workoutIDs, searchParam, exercisesInfo, currentPage, filter, totalPages, day });
             });
         } catch (error) {
             // Handle error
             console.error('Error:', error);
             res.status(500).send('Internal Server Error');
         }
+    }
 });
 
 app.post('/scheduleSearch/:day', async (req, res) => {

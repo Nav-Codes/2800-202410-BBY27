@@ -1,36 +1,35 @@
 <%-include('templates/header');%>
-    <h1 id="dayOfWeek" name="<%= day %>"><%= day %></h1>
-    <p>Current Exercises in list: </p>
-    <%  //import the database array and store it as a local array to be added/deleted to 
-    var exercises = workouts[0][day]; //represents the exercises currently in schedule
-        for (let j = 0; j < workouts[0][day].length; j++) { %>
-            <li>
-                <%= workouts[0][day][j] %>
-            </li>
-        <% }
-    %>
-        <br>
-            <div class="col-md-4">
-            <form action="/scheduleSearch/<%= day %>" method="post" class="d-flex">
-                <div class="dropdown me-2">
-                    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        Difficulty
-                    </button>
-                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                        <a class="dropdown-item" href="/scheduleEditor/<%= day %>?filter=beginner">Beginner</a>
-                        <a class="dropdown-item" href="/scheduleEditor/<%= day %>?filter=intermediate">Intermediate</a>
-                        <a class="dropdown-item" href="/scheduleEditor/<%= day %>?filter=expert">Expert</a>
-                    </div>
+    <h1 id="dayOfWeek" name="<%= day %>"><%= day %></h1><br>
+    <div class="col-md-4">
+        <form action="/scheduleSearch/<%= day %>" method="post" class="d-flex">
+            <div class="dropdown me-2">
+                <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Difficulty
+                </button>
+                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                    <a class="dropdown-item" href="/scheduleEditor/<%= day %>?filter=beginner">Beginner</a>
+                    <a class="dropdown-item" href="/scheduleEditor/<%= day %>?filter=intermediate">Intermediate</a>
+                    <a class="dropdown-item" href="/scheduleEditor/<%= day %>?filter=expert">Expert</a>
                 </div>
-                <input name="search" id="searchbar" class="form-control me-2" type="search" placeholder="Search" aria-label="Search" value="<%= searchParam %>">
-                    <!-- <input type="hidden" name="filter" value="<%= filter %>"> -->
-                <button class="btn btn-primary" type="submit">Submit</button>            
-            </form>
-            <button class="btn button-outline-dark">
-                <a href="/scheduleEditor/<%= day %>">Reset</a>
-            </button>
+            </div>&ensp;
+            <input name="search" id="searchbar" class="form-control me-2" type="search" placeholder="Search" aria-label="Search" value="<%= searchParam %>">&ensp;
+            <a class="btn btn-outline-danger" href="/scheduleEditor/<%= day %>">Reset</a>            
+        </form><p></p>  
+    </div>
+    <div class="dropdown show text-center">
+        <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Current Exercises
+        </a>
+        <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+            <ul class="list-group">
+            <% var exercises = workouts[0][day]; //represents the exercises currently in schedule
+                for (let j = 0; j < workouts[0][day].length; j++) { %>
+                    <a style="font-size:large;" href="/exercise/<%= workoutIDs[j].id %>"><%= workouts[0][day][j] %></a>
+            <% } %>
+        </ul>
         </div>
-
+    </div>
+        <br>
         <!-- workouts listed -->
         <ul class="list-unstyled">
         <% exercisesInfo.forEach(exercise => { %>
@@ -39,9 +38,11 @@
                     <div class="card">
                         <div class="card-body">
                             <!-- Credit: ChatGPT - helped with checkmarking workouts that are already in your workout list -->
-                            <input type="checkbox" <%= exercises.includes(exercise.name) ? 'checked' : '' %> class="selectedWorkout" id="<%=exercise.name%>" name="work" value="<%=exercise.name%>">
+                            <input type="checkbox" <%= exercises.includes(exercise.name) ? 'checked' : '' %> class="selectedWorkout" 
+                                id="<%=exercise.name%>" name="work" value="<%=exercise.name%>">
+                                <i style="color: black;"><%= exercises.includes(exercise.name) ? 'Added Workout' : 'Add' %></i><p></p>
                             <h5 class="card-title"><%= exercise.name %></h5>
-                            <p class="card-text">Muscles: <%= exercise.primaryMuscles[0].charAt(0).toUpperCase() + exercise.primaryMuscles[0].slice(1) %><br>Difficulty: <%=exercise.level.charAt(0).toUpperCase() + exercise.level.slice(1) %></p>
+                            <p class="card-text" style="color: black;">Muscles: <%= exercise.primaryMuscles[0].charAt(0).toUpperCase() + exercise.primaryMuscles[0].slice(1) %><br>Difficulty: <%=exercise.level.charAt(0).toUpperCase() + exercise.level.slice(1) %></p>
                         </div>
                     </div>
                 </a>
@@ -65,11 +66,10 @@
             </li>
         </ul>
     </nav>
-    <form action="/scheduleSave" method="post">
-        <button class="btn button-success" id="saveButton">Save</button>
+    <form class="d-flex p-2" action="/scheduleSave" method="post">
+        <button class="btn btn-success mr-auto p-2" id="saveButton">Save</button>
+        <a class="btn btn-secondary p-2" href="/schedule" style="color: white">Cancel</a>
     </form>
-    <button type="button" class="btn button-outline-light">
-        <a href="/schedule">Cancel</a>
-    </button>
+    <br><br>
     <script src="/public/js/schedule.js"></script>
 <%-include('templates/footer');%>
