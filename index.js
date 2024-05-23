@@ -229,6 +229,46 @@ app.post('/forgotpassword', async (req, res) => {
     }
 });
 
+app.post('/editUser', async(req, res) => {
+    let newUser = req.body.name;
+
+    let user = req.session.email;
+
+    await userCollection.updateOne({ email: user }, { $set: { name: newUser } });
+
+    req.session.name = newUser;
+
+    res.json({message: "Username Successfully Changed"});
+
+})
+
+app.post('/editPass', async(req, res) => {
+    let curr = req.body.curr;
+    let newPass = req.body.newPass;
+
+    let user = req.session.email;
+
+    const result = await userCollection.find({email: user}).project({email: 1, password: 1, name: 1, _id: 1}).toArray();
+
+    if(await bcrypt.compare(curr, result[0].password)){
+
+        let hashNew = await bcrypt.hash(newPass, saltRounds);
+
+        await userCollection.updateOne({ email: user }, { $set: { password: hashNew } });
+
+        res.json({message:"Password Successfully Changed!"});
+
+    } else {
+        res.json({message:"Invalid Current Password"});
+    } 
+
+})
+
+app.get('/editProfile', async (req,res) => {
+    res.render('editProfile');
+})
+
+
 app.post('/resetpassword/:token', async (req, res) => {
     let token = req.params.token;
     let newPassword = req.body.password;
