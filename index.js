@@ -330,10 +330,18 @@ app.get('/loggedin', async (req, res) => {
 });
 
 app.get('/profile', (req, res) => {
+    if (!req.session.authenticated) {
+        res.redirect('/login');
+        return;
+    }
     res.render('userProfile', {username : req.session.name});
 });
 
 app.get('/editProfile', (req, res) => {
+    if (!req.session.authenticated) {
+        res.redirect('/login');
+        return;
+    }
     res.render('editProfile');
 });
 
