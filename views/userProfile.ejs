@@ -1,7 +1,13 @@
 <%- include('templates/header'); %>
+<style>
+    .profile-picture {
+        width: 175px;
+        height: 175px; 
+    }
+</style>
 <div class="text-center">
     <p class="h2">Welcome, <%=username%>!</p>
-    <img src="https://via.placeholder.com/300" class="rounded-circle mx-auto d-block my-3" alt="profile picture">
+    <img src="/profilePicture" class="profile-picture rounded-circle mx-auto d-block my-3" alt="profile picture">
     Edit Profile <a href="/editProfile"><i class="fas fa-pen"></i></a>
 </div>
 <br><br>

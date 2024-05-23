@@ -9,6 +9,10 @@ const app = express();
 const nodemailer = require('nodemailer');
 const { createHmac } = require('node:crypto');
 
+const multer = require('multer');
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
+
 app.use(favicon(path.join(__dirname,'public','favicon.ico')));
 
 const session = require('express-session');
@@ -228,6 +232,58 @@ app.post('/forgotpassword', async (req, res) => {
         res.status(500).send('Error sending email');
     }
 });
+
+app.post('/uploadProfilePicture', upload.single('profilePicture'), async (req, res) => {
+    if (!req.session.authenticated) {
+        res.redirect('/login');
+        return;
+    }
+
+    if (req.file) {
+        const email = req.session.email;
+        const profilePicture = req.file.buffer;
+
+        try {
+            // Update user document with profile picture
+            await userCollection.updateOne(
+                { email: email },
+                { $set: { profilePicture: profilePicture } }
+            );
+
+            res.redirect('/profile');
+        } catch (error) {
+            console.error('Error updating profile picture:', error);
+            res.status(500).send('Error updating profile picture');
+        }
+    } 
+});
+
+app.get('/profilePicture', async (req, res) => {
+    if (!req.session.authenticated) {
+        res.redirect('/login');
+        return;
+    }
+
+    try {
+        const email = req.session.email;
+        const user = await userCollection.findOne(
+            { email: email },
+            { projection: { profilePicture: 1 } }
+        );
+
+        if (user && user.profilePicture) {
+            res.set('Content-Type', 'image/jpeg');
+            res.send(user.profilePicture.buffer);
+        } else {
+            // Send a default placeholder image if no profile picture is found
+            res.redirect('https://via.placeholder.com/300');
+        }
+    } catch (error) {
+        console.error('Error fetching profile picture:', error);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
 
 app.post('/editUser', async(req, res) => {
     let newUser = req.body.name;
