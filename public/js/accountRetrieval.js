@@ -1,3 +1,4 @@
+// Function that opens the forgot password modal and sets its content.
 function openForgotPasswordModal() {
     let modalBody = document.querySelector(".modal-body");
     modalBody.innerHTML = `
@@ -12,6 +13,7 @@ function openForgotPasswordModal() {
     $('#loginModal').modal('show'); // Show the modal
 }
 
+// Function that handles form submission and changes the modal content.
 function changeModal(event) {
     event.preventDefault(); // Prevent the default form submission behavior
 
