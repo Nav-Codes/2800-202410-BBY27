@@ -67,7 +67,7 @@
         margin-top: 20px;
     }
     .workoutList {
-                margin-left: -35px;
+        margin-left: -35px;
     }
     /* End of Goals Section */
 </style>
@@ -82,18 +82,22 @@
             <div class="progress">
                 <div class="progress-done"></div>
             </div>
-   
-            <div class="inputContainer">
-                <div>
-                    <h3>Value</h3>
-                    <input class="input" type="number" />
-                </div>
 
+            <% if (result && result.goal && result.goal.length > 0) { %>
+                <% const randomGoal = result.goal[Math.floor(Math.random() * result.goal.length)]; %>
                 <div>
-                    <h3>Max Value</h3>
-                    <input class="maxInput" type="number" />
+                    <h3><%= randomGoal[2] %></h3>
+                    <p><%= randomGoal[3] %> out of <%= randomGoal[0] %> completed!</p>
                 </div>
-            </div>
+                <script>
+                    var randomGoal = <%- JSON.stringify(randomGoal) %>;
+                </script>
+            <% } else { %>
+                <h3> You have no goals yet!</h3>
+                <script>
+                    var randomGoal = null;
+                </script>
+            <% } %>
         </div>
     </div>
     <script src="/public/js/goalsHome.js"></script>
