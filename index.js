@@ -16,7 +16,8 @@ const upload = multer({ storage: storage });
 app.use(favicon(path.join(__dirname,'public','favicon.ico')));
 
 const session = require('express-session');
-const fs = require('fs').promises;
+const fs = require('fs');
+const fspromise = require('fs').promises;
 app.use(express.urlencoded({extended: false}));
 
 // Serve static files from the dist/exercises directory
@@ -777,7 +778,7 @@ app.get('/', async (req, res) => {
         .toArray();
         try {
             // Read the JSON file
-            const data = await fs.readFile("./dist/exercises.json", 'utf8');
+            const data = await fspromise.readFile("./dist/exercises.json", 'utf8');
             let jsonData = JSON.parse(data);
 
             let searchParam = req.query.search || "";
