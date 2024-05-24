@@ -3,35 +3,41 @@
 <div class="container" style="padding: 5%;">
     <div class="row">
         <div class="col text-center">
-            <% if (filteredExercises == "") { %>
+            <% if (!filteredExercises.length) { %> <!-- Check if there are no filtered exercises -->
                 <h3>Exercise not found</h3>
             <% } else { %>
                 <ul class="list-group">
                     <% filteredExercises.forEach(exercise => { %>
                         <li class="list-group-item" style="background-color: #A8EEE1;">
                             <h1><strong><%= exercise.name.charAt(0).toUpperCase() + exercise.name.slice(1) %></strong></h1>
-                            <% if (exercise.images[1] != null) { %>
-                                <img src="/exercises/<%= exercise.images[1] %>" alt="<%= exercise.name %>" class="img-fluid">
-                            <% } else { %>
-                            <img src="/exercises/<%= exercise.images[0] %>" alt="<%= exercise.name %>" class="img-fluid">
-                            <% } %>
+                            <!-- Display the second image if available, otherwise display the first image -->
+                            <img src="/exercises/<%= exercise.images[1] || exercise.images[0] %>" alt="<%= exercise.name %>" class="img-fluid">
+                            
+                            <!-- Display exercise difficulty level -->
                             <p>
                                 <strong>Difficulty:</strong>
                                 <%= exercise.level.charAt(0).toUpperCase() + exercise.level.slice(1) %>
-                                <% if (exercise.equipment != null) { %>
                             </p>
+                            
+                            <!-- Conditionally display equipment if available -->
+                            <% if (exercise.equipment) { %>
                             <p>
                                 <strong>Equipment:</strong> <%= exercise.equipment.charAt(0).toUpperCase() + exercise.equipment.slice(1) %>
-                                <% } %>
                             </p>
+                            <% } %>
+                            
+                            <!-- Display primary muscles -->
                             <p>
                                 <strong>Primary Muscles:</strong>
                                 <%= exercise.primaryMuscles[0].charAt(0).toUpperCase() + exercise.primaryMuscles[0].slice(1) %>
-                                <% if (exercise.secondaryMuscles[0] != null) { %>
+                                <!-- Conditionally display accessory muscles if available -->
+                                <% if (exercise.secondaryMuscles.length) { %>
                                     <strong>Accessory Muscles:</strong>
                                     <%= exercise.secondaryMuscles.map(muscle => muscle.charAt(0).toUpperCase() + muscle.slice(1)).join(', ') %>
                                 <% } %>
                             </p>
+                            
+                            <!-- Display exercise instructions -->
                             <p>
                                 <strong>Instructions:</strong>
                                 <%= exercise.instructions.join(' ') %>
