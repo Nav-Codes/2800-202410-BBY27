@@ -22,6 +22,12 @@ document.getElementById('editUsernameForm').addEventListener('submit', function(
 
     const name = document.getElementById('usernameInput').value;
 
+    if (!name.trim()) {
+        let modalBody = document.querySelector(".modal-body-user");
+        modalBody.innerHTML =  'Username cannot be empty.'
+        return;
+    }
+
     ajaxPOST("/editUser",{name: name}, function(response){
         let parsedResponse = JSON.parse(response);
         let modalBody = document.querySelector(".modal-body-user");
@@ -38,6 +44,12 @@ document.getElementById('editPasswordForm').addEventListener('submit', function(
      // Get the form data
      const curpassword = document.getElementById('currentPasswordInput').value;
      const newPass = document.getElementById('newPasswordInput').value;
+
+     if (!curpassword.trim() || !newPass.trim()) {
+        let modalBody = document.querySelector(".modal-body-pass");
+        modalBody.innerHTML = 'Current password and new password fields cannot be empty.'
+        return;
+    }
 
     ajaxPOST("/editPass",{curr: curpassword, newPass: newPass}, function(response){
         let parsedResponse = JSON.parse(response);
