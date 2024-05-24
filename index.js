@@ -9,6 +9,10 @@ const app = express();
 const nodemailer = require('nodemailer');
 const { createHmac } = require('node:crypto');
 
+const multer = require('multer');
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
+
 app.use(favicon(path.join(__dirname,'public','favicon.ico')));
 
 const session = require('express-session');
@@ -229,6 +233,58 @@ app.post('/forgotpassword', async (req, res) => {
     }
 });
 
+app.post('/uploadProfilePicture', upload.single('profilePicture'), async (req, res) => {
+    if (!req.session.authenticated) {
+        res.redirect('/login');
+        return;
+    }
+
+    if (req.file) {
+        const email = req.session.email;
+        const profilePicture = req.file.buffer;
+
+        try {
+            // Update user document with profile picture
+            await userCollection.updateOne(
+                { email: email },
+                { $set: { profilePicture: profilePicture } }
+            );
+
+            res.redirect('/profile');
+        } catch (error) {
+            console.error('Error updating profile picture:', error);
+            res.status(500).send('Error updating profile picture');
+        }
+    } 
+});
+
+app.get('/profilePicture', async (req, res) => {
+    if (!req.session.authenticated) {
+        res.redirect('/login');
+        return;
+    }
+
+    try {
+        const email = req.session.email;
+        const user = await userCollection.findOne(
+            { email: email },
+            { projection: { profilePicture: 1 } }
+        );
+
+        if (user && user.profilePicture) {
+            res.set('Content-Type', 'image/jpeg');
+            res.send(user.profilePicture.buffer);
+        } else {
+            // Send a default placeholder image if no profile picture is found
+            res.redirect('https://via.placeholder.com/300');
+        }
+    } catch (error) {
+        console.error('Error fetching profile picture:', error);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
+
 app.post('/editUser', async(req, res) => {
     let newUser = req.body.name;
 
@@ -371,10 +427,18 @@ app.get('/loggedin', async (req, res) => {
 });
 
 app.get('/profile', (req, res) => {
+    if (!req.session.authenticated) {
+        res.redirect('/login');
+        return;
+    }
     res.render('userProfile', {username : req.session.name});
 });
 
 app.get('/editProfile', (req, res) => {
+    if (!req.session.authenticated) {
+        res.redirect('/login');
+        return;
+    }
     res.render('editProfile');
 });
 
@@ -395,19 +459,28 @@ app.get('/schedule', async (req, res) => {
 });
 
 app.get('/scheduleEditor/:day', async (req, res) => {
-    //gets workout schedule based on unique email    
-    
-    //Credit: ChatGPT
-    //This creates a projection object that references a property of an object
-    const projection = {};
-    projection[req.params.day] = 1;
+    //gets workout schedule based on unique email  
 
-    const workouts = await scheduleCollection
-        .find({ email: req.session.email })
-        .project(projection)
-        .toArray();
-    
+    if (!req.session.authenticated) {
+        res.redirect('/login');
+        return;
+    }
     var day = req.params.day;
+    let gotActualDay = false;
+
+    const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+    for (let i = 0; i < daysOfWeek.length; i++) {
+        if (daysOfWeek[i] == day) {
+            gotActualDay = true;
+            break;
+        }
+    }
+
+    if (gotActualDay) {
+        const workouts = await scheduleCollection
+            .find({ email: req.session.email })
+            .project({ [day]: 1 })
+            .toArray();
 
         try {
             // Read the JSON file
@@ -417,42 +490,57 @@ app.get('/scheduleEditor/:day', async (req, res) => {
                     res.status(500).send('Internal Server Error');
                     return;
                 }
-    
+
                 let searchParam = "";
-    
+
                 // Parse the JSON data
                 let jsonData = JSON.parse(data);
-                if (req.query.search != null){
+                
+                let workoutData = jsonData;
+
+                if (req.query.search != null) {
                     jsonData = jsonData.filter(item => item.name.toLowerCase().includes(req.query.search));
                     searchParam = req.query.search;
                 }
-    
+
                 let filter = req.query.filter || "";
-                if (filter){
+                if (filter) {
                     jsonData = jsonData.filter(item => item.level == req.query.filter);
                 }
-    
+
+                //get ids of workouts for given day
+                let workoutIDs = [];
+                for (let i = 0; i < workouts[0][day].length; i++) {
+                    for (let j = 0; j < workoutData.length; j++) {
+                        if (workouts[0][day][i] == workoutData[j].name) {
+                            workoutIDs.push(workoutData[j]);
+                            break;
+                        }
+                    }
+                }
+
                 // Calculate pagination parameters
                 const pageSize = 20; // Number of exercises per page
                 const totalPages = Math.ceil(jsonData.length / pageSize);
                 let currentPage = parseInt(req.query.page) || 1; // Default to page 1 if not specified
                 currentPage = Math.min(Math.max(currentPage, 1), totalPages); // Ensure current page is within valid range
-    
+
                 // Calculate the start and end indices of exercises for the current page
                 const startIndex = (currentPage - 1) * pageSize;
                 const endIndex = Math.min(startIndex + pageSize, jsonData.length);
-    
+
                 // Extract names, images, and descriptions from the JSON data for the current page
                 const exercisesInfo = jsonData.slice(startIndex, endIndex);
-    
+
                 // Send the list of exercises for the current page as response
-            res.render('scheduleEditor', {workouts, searchParam, exercisesInfo, currentPage, filter, totalPages, day});
+                res.render('scheduleEditor', { workouts, workoutIDs, searchParam, exercisesInfo, currentPage, filter, totalPages, day });
             });
         } catch (error) {
             // Handle error
             console.error('Error:', error);
             res.status(500).send('Internal Server Error');
         }
+    }
 });
 
 app.post('/scheduleSearch/:day', async (req, res) => {
@@ -462,14 +550,30 @@ app.post('/scheduleSearch/:day', async (req, res) => {
 });
 
 app.post('/scheduleSave', async (req, res) => {    
-    let workoutArray = req.body.newSched;
+    let workout = req.body.newWorkout;
     let day = req.body.day;
-    console.log(workoutArray);
-    console.log(day);
 
-    //update the database
-    await scheduleCollection.updateOne({email : req.session.email}, {$set : {[day] : workoutArray}});
-    res.redirect('schedule');
+    let currentWorkouts = await scheduleCollection
+            .find({ email: req.session.email })
+            .project({ [day]: 1 })
+            .toArray();
+
+    if (req.body.adding) { //adding to database
+        if (currentWorkouts[0][day][0] == "No workouts") { //when adding to workout that is initially empty
+            await scheduleCollection.updateOne({email : req.session.email}, {$pull : {[day] : "No workouts"}})
+        }
+        await scheduleCollection.updateOne({email : req.session.email}, {$push : {[day] : workout}});
+    } else { //removing from database
+        await scheduleCollection.updateOne({email : req.session.email}, {$pull : {[day] : workout}});
+        currentWorkouts = await scheduleCollection
+            .find({ email: req.session.email })
+            .project({ [day]: 1 })
+            .toArray();
+        if (currentWorkouts[0][day].length == 0) { //if removing workout makes array empty
+            await scheduleCollection.updateOne({email : req.session.email}, {$push : {[day] : "No workouts"}});
+        }
+    }
+    res.redirect('/scheduleEditor/' + day)
 });
 
 app.get('/goals', async (req, res) => {
@@ -662,6 +766,15 @@ function getRandomExercises(exercises, count) {
 
 app.get('/', async (req, res) => {
     if (req.session.authenticated) {
+        //Credit: w3schools - create an array with all week day names, 
+        //use date object to get current day, and use number returned to access day from array
+        const weekday = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+        const d = new Date();
+        let today = weekday[d.getDay()]
+        let todaysWorkouts = await scheduleCollection
+        .find({email: req.session.email})
+        .project({[today]: 1})
+        .toArray();
         try {
             // Read the JSON file
             const data = await fs.readFile("./dist/exercises.json", 'utf8');

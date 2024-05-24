@@ -46,3 +46,11 @@ document.getElementById('editPasswordForm').addEventListener('submit', function(
         $('#passwordSuccessModal').modal('show');
     })
 });
+
+document.getElementById('uploadProfilePictureForm').addEventListener('submit', function(e) {
+  const fileInput = document.getElementById('profilePictureInput');
+  if (!fileInput.value) {
+    e.preventDefault();
+    alert('Please select a file to upload.');
+  }
+});
