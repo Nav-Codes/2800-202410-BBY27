@@ -798,8 +798,20 @@ app.get('/', async (req, res) => {
             const result = await userCollection.findOne({ email: req.session.email });
             console.log(result);
 
+            //get the id's of the current days workouts
+            let workoutIDs = [];
+
+            for (let i = 0; i < todaysWorkouts[0][today].length; i++) {
+                for (let j = 0; j < jsonData.length; j++) {
+                    if (todaysWorkouts[0][today][i] == jsonData[j].name) {
+                        workoutIDs.push(jsonData[j]);
+                        break;
+                    }
+                }
+            }
+
             // Render the page with the random exercises and MongoDB result
-            res.render('homeAuthenticated', { exercisesInfo, result });
+            res.render('homeAuthenticated', { exercisesInfo, result, workoutNames: todaysWorkouts, workoutIDs: workoutIDs, currentDay: today });
         } catch (error) {
             // Handle error
             console.error('Error:', error);
