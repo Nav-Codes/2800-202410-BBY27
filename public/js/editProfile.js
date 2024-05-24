@@ -66,3 +66,12 @@ document.getElementById('uploadProfilePictureForm').addEventListener('submit', f
     alert('Please select a file to upload.');
   }
 });
+
+// Refresh the page when the modal closes
+$('#usernameSuccessModal').on('hide.bs.modal', function () {
+    location.reload();
+});
+
+$('#passwordSuccessModal').on('hide.bs.modal', function () {
+    location.reload();
+});
