@@ -453,14 +453,30 @@ app.post('/scheduleSearch/:day', async (req, res) => {
 });
 
 app.post('/scheduleSave', async (req, res) => {    
-    let workoutArray = req.body.newSched;
+    let workout = req.body.newWorkout;
     let day = req.body.day;
-    console.log(workoutArray);
-    console.log(day);
 
-    //update the database
-    await scheduleCollection.updateOne({email : req.session.email}, {$set : {[day] : workoutArray}});
-    res.redirect('schedule');
+    let currentWorkouts = await scheduleCollection
+            .find({ email: req.session.email })
+            .project({ [day]: 1 })
+            .toArray();
+
+    if (req.body.adding) { //adding to database
+        if (currentWorkouts[0][day][0] == "No workouts") { //when adding to workout that is initially empty
+            await scheduleCollection.updateOne({email : req.session.email}, {$pull : {[day] : "No workouts"}})
+        }
+        await scheduleCollection.updateOne({email : req.session.email}, {$push : {[day] : workout}});
+    } else { //removing from database
+        await scheduleCollection.updateOne({email : req.session.email}, {$pull : {[day] : workout}});
+        currentWorkouts = await scheduleCollection
+            .find({ email: req.session.email })
+            .project({ [day]: 1 })
+            .toArray();
+        if (currentWorkouts[0][day].length == 0) { //if removing workout makes array empty
+            await scheduleCollection.updateOne({email : req.session.email}, {$push : {[day] : "No workouts"}});
+        }
+    }
+    res.redirect('/scheduleEditor/' + day)
 });
 
 app.get('/goals', async (req, res) => {
@@ -697,7 +713,7 @@ app.get('/', async (req, res) => {
                             break;
                         }
                     }
-                }    
+                }
                 // Render the page with the random exercises and todays exercises
                 res.render('homeAuthenticated', {exercisesInfo: randomExercises, workoutNames: todaysWorkouts, workoutIDs: workoutIDs, currentDay: today});
             });

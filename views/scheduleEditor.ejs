@@ -44,7 +44,7 @@
                             <!-- Credit: ChatGPT - helped with checkmarking workouts that are already in your workout list -->
                             <input type="checkbox" <%= exercises.includes(exercise.name) ? 'checked' : '' %> class="selectedWorkout" 
                                 id="<%=exercise.name%>" name="work" value="<%=exercise.name%>">
-                                <i style="color: black;"><%= exercises.includes(exercise.name) ? 'Added Workout' : 'Add' %></i><p></p>
+                            <i id="<%=exercise.name%>" style="color: black;"> Add Workout</i><p></p>
                             <h5 class="card-title"><%= exercise.name %></h5>
                             <p class="card-text" style="color: black;">Muscles: <%= exercise.primaryMuscles[0].charAt(0).toUpperCase() + exercise.primaryMuscles[0].slice(1) %><br>Difficulty: <%=exercise.level.charAt(0).toUpperCase() + exercise.level.slice(1) %></p>
                         </div>
@@ -70,10 +70,7 @@
             </li>
         </ul>
     </nav>
-    <form class="d-flex p-2" action="/scheduleSave" method="post">
-        <button class="btn btn-success mr-auto p-2" id="saveButton">Save</button>
-        <a class="btn btn-secondary p-2" href="/schedule" style="color: white">Cancel</a>
-    </form>
+    <a class="btn btn-secondary p-2" href="/schedule" style="color: white">Back to Schedule</a>
     <br><br>
     <script src="/public/js/schedule.js"></script>
 <%-include('templates/footer');%>
