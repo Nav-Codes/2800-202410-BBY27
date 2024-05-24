@@ -22,80 +22,88 @@
 </div>
 <!-- End Confirmation Modal -->
 
-<div class="container mt-5">
-    <!-- Button to trigger the modal -->
+<div class="container" style="padding: 5%;">
+    <!-- Button to Trigger the Add Goal Modal -->
     <div class="text-center mb-4">
         <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addGoalModal">
             Add Goal
         </button>
     </div>
 
-    <!-- Modal -->
+    <!-- Add Goal Modal -->
     <div class="modal fade" id="addGoalModal" tabindex="-1" role="dialog" aria-labelledby="addGoalModalLabel" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered" role="document">
-          <div class="modal-content">
-              <div class="modal-header">
-                  <h5 class="modal-title" id="addGoalModalLabel">Create Goal</h5>
-                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                      <span aria-hidden="true">&times;</span>
-                  </button>
-              </div>
-              <div class="modal-body">
-                  <form id="addGoalForm" action="/addgoal" method="post">
-                      <div class="form-group">
-                          <label for="quantity">Quantity</label>
-                          <input name="quantity" type="text" class="form-control" id="quantity" placeholder="Enter Quantity" required>
-                      </div>
-                      <div class="form-group">
-                          <label for="unit">Unit Type</label>
-                          <input name="unit" type="text" class="form-control" id="unit" placeholder="Enter Unit" required>
-                      </div>
-                      <div class="form-group">
-                          <label for="goal">Goal</label>
-                          <input name="goal" type="text" class="form-control" id="goal" placeholder="Enter Goal" required>
-                      </div>
-                      <button type="submit" class="btn btn-primary">Submit</button>
-                  </form>
-              </div>
-          </div>
-      </div>
-  </div>
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addGoalModalLabel">Create Goal</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="addGoalForm" action="/addgoal" method="post">
+                        <!-- Quantity Input -->
+                        <div class="form-group">
+                            <label for="quantity">Quantity</label>
+                            <input name="quantity" type="text" class="form-control" id="quantity" placeholder="Enter Quantity" required>
+                        </div>
+                        <!-- Unit Type Input -->
+                        <div class="form-group">
+                            <label for="unit">Unit Type</label>
+                            <input name="unit" type="text" class="form-control" id="unit" placeholder="Enter Unit" required>
+                        </div>
+                        <!-- Goal Input -->
+                        <div class="form-group">
+                            <label for="goal">Goal</label>
+                            <input name="goal" type="text" class="form-control" id="goal" placeholder="Enter Goal" required>
+                        </div>
+                        <!-- Submit Button -->
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Goals List -->
     <div class="list-group">
-      <% if (result && result.goal && result.goal.length > 0) { %>
-          <% result.goal.forEach((item, index) => { %>
-              <div class="list-group-item position-relative mb-3"> <!-- Added mb-3 for spacing -->
-                  <div class="goal-info">
-                      <strong><%= item[2] %>:</strong>
-                      <div><%= item[3] %> <%= item[1] %>/<%= item[0] %> <%= item[1] %> completed.</div>
-                  </div>
-                  <div class="goal-actions mt-2">
-                      <form id="contributeForm" action="/contribute" method="post">
-                          <input type="hidden" name="goalIndex" value="<%= index %>">
-                          <div class="input-group">
-                              <input name="quantity" type="text" class="form-control form-control-sm" id="quantity" placeholder="Amount Complete" required>
-                              <div class="input-group-append">
-                                  <button type="submit" class="btn btn-primary btn-sm">Contribute</button>
-                              </div>
-                          </div>
-                      </form>
-                  </div>
-                  <form id="deleteGoalForm<%= index %>" action="/deletegoal" method="post" class="position-absolute" style="top: 10px; right: 20px;">
-                    <input type="hidden" name="goalIndex" value="<%= index %>">
-                    <button type="button" class="btn btn-danger btn-sm delete-goal-btn" data-toggle="modal" data-target="#confirmationModal">Delete Goal</button>
-                </form>              
-              </div>
-          <% }); %>
-      <% } else { %>
-          <div class="list-group-item">No goals found.</div>
-      <% } %>
-  </div>
+        <% if (result && result.goal && result.goal.length > 0) { %>
+            <% result.goal.forEach((item, index) => { %>
+                <div class="list-group-item position-relative mb-3">
+                    <!-- Goal Information -->
+                    <div class="goal-info">
+                        <strong><%= item[2] %>:</strong>
+                        <div><%= item[3] %> <%= item[1] %> / <%= item[0] %> <%= item[1] %> completed.</div>
+                    </div>
+                    <!-- Contribute Form -->
+                    <div class="goal-actions mt-2">
+                        <form id="contributeForm" action="/contribute" method="post">
+                            <input type="hidden" name="goalIndex" value="<%= index %>">
+                            <div class="input-group">
+                                <input name="quantity" type="text" class="form-control form-control-sm" id="quantity" placeholder="Amount Complete" required>
+                                <div class="input-group-append">
+                                    <button type="submit" class="btn btn-primary btn-sm">Contribute</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <!-- Delete Goal Form -->
+                    <form id="deleteGoalForm<%= index %>" action="/deletegoal" method="post" class="position-absolute" style="top: 10px; right: 20px;">
+                        <input type="hidden" name="goalIndex" value="<%= index %>">
+                        <button type="button" class="btn btn-danger btn-sm delete-goal-btn" data-toggle="modal" data-target="#confirmationModal">Delete Goal</button>
+                    </form>              
+                </div>
+            <% }); %>
+        <% } else { %>
+            <!-- No Goals Found Message -->
+            <div class="list-group-item">No goals found.</div>
+        <% } %>
+    </div>
 </div>
 
 <%- include('templates/footer'); %>
 
-<!-- JavaScript for delete action -->
+<!-- JavaScript for Delete Action -->
 <script>
     $(document).ready(function() {
         // Handle delete action when the "Delete" button in the confirmation modal is clicked
@@ -112,8 +120,3 @@
         });
     });
 </script>
-
-
-    
-
-    
