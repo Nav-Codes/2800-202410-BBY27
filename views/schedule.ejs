@@ -1,45 +1,15 @@
 <%-include('templates/header');%>
-    <head>
-        <style>
-            /* Credit: ChatGPT
-            Helped create a hotizontal scrolling feature 
-            Custom CSS for horizontal scrolling */
-            .scrolling-wrapper {
-                overflow-x: auto;
-                white-space: nowrap;
-            }
-
-            .card {
-                display: inline-block;
-                width: 150px;
-                height: 400px;
-                overflow-x: hidden;
-                /* Adjust as needed */
-                /*margin-right: 10px;*/
-                /* Adjust as needed */
-            }
-
-            .workoutList {
-                margin-left: -35px;
-            }
-
-            #newItem {
-                width: 130px;
-                margin-left: 15px;
-            }
-        </style>
-    </head>
     <div class="container-fluid">
         <div class="row">
             <div class="col">
-                <h2>Weekly Workout Schedule</h2>
+                <h2 class="text-center">Weekly Workout Schedule</h2>
                 <div class="scrolling-wrapper">
                     <%  for (let day in workouts[0]) {
                             if (workouts[0][day][0] == undefined) {
                                 continue;
                             } 
                             let currentDay = '' + day; %>
-                        <div class="card">
+                        <div class="card" style="font-size: larger;">
                             <div class="card-body">
                                 <h5 class="card-title">
                                     <%= currentDay; %>
@@ -52,11 +22,11 @@
                                     <% } %>
                                 </ul>
                             </div>
-                            <form action="/scheduleEditor/<%=currentDay%>" method="get">
-                                <button class="btn btn-outline-primary">Edit</button>
+                            <form action="/scheduleEditor/<%=currentDay%>" method="get" style="margin: 5%;">
+                                <button class="btn btn-primary">Edit</button>
                             </form>
-                        </div>
-                    <% } %>
+                        </div><p></p>
+                    <% } %><br>
                 </div>
             </div>
         </div>

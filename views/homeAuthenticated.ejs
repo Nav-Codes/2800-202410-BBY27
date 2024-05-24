@@ -57,6 +57,9 @@
         align-items: center;
         margin-top: 20px;
     }
+    .workoutList {
+                margin-left: -35px;
+    }
     /* End of Goals Section */
 </style>
 
@@ -66,7 +69,29 @@
 </a>
 
 <a href="/schedule">
-    <div class="rectangle box-shadow-3d" style="background-color: #A8EEE1; color: black; text-decoration: none;">Workout Plan</div>
+    <div class="rectangle box-shadow-3d" style="background-color: #A8EEE1;">
+        <p style="color: black;">Workout Plan</p>
+        <!-- show todays workouts here -->
+        <div class="card" style="background-color: #71e4cf;">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <a style="font-size: 20pt; color: black;" href="/scheduleEditor/<%=currentDay%>"><%= currentDay; %></a>
+                </h5>
+                <ul class="list-group">
+                    <% for (let j = 0; j < workoutNames[0][currentDay].length; j++) { 
+                        if (workoutIDs.length == 0) { %>
+                            <p>No workouts</p>
+                        <% break;
+                        } %>
+                        <li class="list-group-item border border-dark rounded" style="background-color: #71e4cf; color: black; font-size: 15pt;">
+                            <u><a style="color: black" href="/exercise/<%= workoutIDs[j].id %>"><%= workoutNames[0][currentDay][j] %></a></u>
+                        </li><p></p>
+                    <% } %>
+                </ul>
+            </div>
+            <p></p>
+        </div>
+    </div>
 </a>
 
 <a href="/exercises">
