@@ -2,24 +2,24 @@
 
 <style>
     .rectangle {
-    height: auto;
-    width: 70vw;
-    border-radius: 10px;
-    margin: 0 auto;
-    text-align: center;
-    padding: 10px;
-    font-size: xx-large;
-    margin-bottom: 20px;
-    margin-top: 20px;
+        height: auto;
+        width: 70vw;
+        border-radius: 10px;
+        margin: 0 auto;
+        text-align: center;
+        padding: 10px;
+        font-size: xx-large;
+        margin-bottom: 20px;
+        margin-top: 20px;
     }
 
-    .box-shadow-3d{
-    box-shadow: 1px 1px 0px #999,
-                2px 2px 0px #999,
-                3px 3px 0px #999,
-                4px 4px 0px #999,
-                5px 5px 0px #999,
-                6px 6px 0px #999;
+    .box-shadow-3d {
+        box-shadow: 1px 1px 0px #999,
+                    2px 2px 0px #999,
+                    3px 3px 0px #999,
+                    4px 4px 0px #999,
+                    5px 5px 0px #999,
+                    6px 6px 0px #999;
     }
 
     .rectangle:hover {
@@ -27,11 +27,21 @@
     }
 
     /* For Goals Section */
+    .progress-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-top: 20px;
+    }
+
     .progress {
+        display: flex;
+        align-items: center;
         background-color: gray;
-        border-radius: 13px;
+        border-radius: 20px;
         height: 30px;
-        width: 300px;
+        width: 65vw;
+        margin-bottom: 20px;
     }
 
     .progress-done {
@@ -40,10 +50,9 @@
         justify-content: center;
         background-image: repeating-linear-gradient(
             to left,
-            #A9E7E6,
-            #8DD6EF,
-            #54C6EE);
-        box-shadow: 0 3px 3px -5px #A9E7E6, 0 2px 5px #8DD6EF;
+            #BBDEFB,
+            #B2DFDB );
+        box-shadow: 0 5px 5px -6px #BBDEFB, 0 3px 7px #B2DFDB ;
         border-radius: 20px;
         color: #fff;
         height: 100%;
@@ -55,15 +64,37 @@
         display: flex;
         justify-content: space-evenly;
         align-items: center;
-        margin-top: 20px;
     }
     /* End of Goals Section */
 </style>
 
-<a href="/goals">
-    <div class="rectangle box-shadow-3d" style="background-color: #EBB0D7; color: black; text-decoration: none;">Goals</div>
-    <!-- https://www.youtube.com/watch?v=Ll5f0jGIqa4 -->
-</a>
+<!-- <a href="/goals"> -->
+    <div class="rectangle box-shadow-3d" style="background-color: #EBB0D7; color: black; text-decoration: none;">
+        Goals
+        <!-- https://www.youtube.com/watch?v=Ll5f0jGIqa4 -->
+
+        <!-- Progress Bar -->
+        <div class="progress-container">
+            <div class="progress">
+                <div class="progress-done"></div>
+            </div>
+            <h3>Goals:</h3>
+        
+            <div class="inputContainer">
+                <div>
+                    <h3>Value</h3>
+                    <input class="input" type="number" />
+                </div>
+
+                <div>
+                    <h3>Max Value</h3>
+                    <input class="maxInput" type="number" />
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="/public/js/goalsHome.js"></script>
+<!-- </a> -->
 
 <a href="/schedule">
     <div class="rectangle box-shadow-3d" style="background-color: #A8EEE1; color: black; text-decoration: none;">Workout Plan</div>

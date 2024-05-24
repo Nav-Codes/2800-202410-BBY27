@@ -476,6 +476,7 @@ app.get('/goals', async (req, res) => {
     if (!req.session.authenticated) {
         res.redirect('/login');
     }
+
     const result = await userCollection.findOne({ email: req.session.email });
     console.log(result);
     res.render('goals', { result });
@@ -659,37 +660,35 @@ function getRandomExercises(exercises, count) {
     return randomExercises;
 }
 
-app.get('/', (req, res) => {
+const fs = require('fs').promises;
+
+app.get('/', async (req, res) => {
     if (req.session.authenticated) {
         try {
             // Read the JSON file
-            fs.readFile("./dist/exercises.json", 'utf8', (err, data) => {
-                if (err) {
-                    console.error('Error reading file:', err);
-                    res.status(500).send('Internal Server Error');
-                    return;
-                }
-    
-                let searchParam = "";
-    
-                // Parse the JSON data
-                let jsonData = JSON.parse(data);
-                if (req.query.search != null){
-                    jsonData = jsonData.filter(item => item.name.toLowerCase().includes(req.query.search));
-                    searchParam = req.query.search;
-                }
-    
-                let filter = req.query.filter || "";
-                if (filter){
-                    jsonData = jsonData.filter(item => item.level == req.query.filter);
-                }
-    
-                // Randomly select 3 exercises
-                const randomExercises = getRandomExercises(jsonData, 3);
-    
-                // Render the page with the random exercises
-                res.render('homeAuthenticated', {exercisesInfo: randomExercises});
-            });
+            const data = await fs.readFile("./dist/exercises.json", 'utf8');
+            let jsonData = JSON.parse(data);
+
+            let searchParam = req.query.search || "";
+
+            if (searchParam) {
+                jsonData = jsonData.filter(item => item.name.toLowerCase().includes(searchParam));
+            }
+
+            let filter = req.query.filter || "";
+            if (filter) {
+                jsonData = jsonData.filter(item => item.level === filter);
+            }
+
+            // Randomly select 3 exercises
+            const exercisesInfo = getRandomExercises(jsonData, 3);
+
+            // Fetch the user's goals from the database based on their email
+            const result = await userCollection.findOne({ email: req.session.email });
+            console.log(result);
+
+            // Render the page with the random exercises and MongoDB result
+            res.render('homeAuthenticated', { exercisesInfo, result });
         } catch (error) {
             // Handle error
             console.error('Error:', error);

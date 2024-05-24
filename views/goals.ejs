@@ -1,10 +1,5 @@
 <%- include('templates/header'); %>
 
-<!-- Button to trigger the modal -->
-<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addGoalModal">
-    Add Goal
-</button>
-
 <!-- Modal -->
 <div class="modal fade" id="addGoalModal" tabindex="-1" role="dialog" aria-labelledby="addGoalModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
@@ -45,8 +40,8 @@
           <button type="submit" class="close" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
-          <strong>Complete <%= item[0] %><%= item[1] %> of <%= item[2] %>:</strong>
-          <%= item[3] %><%= item[1] %>/<%= item[0] %><%= item[1] %> completed.
+          <strong>Complete goal "<%= item[2] %>":</strong>
+          <%= item[3] %> <%= item[1] %> / <%= item[0] %> <%= item[1] %> completed.
         </form>
         <!-- Contribute Button -->
     <label class="list-group-item">
@@ -62,6 +57,12 @@
     <label class="list-group-item">No goals found.</label>
   <% } %>
 </div>
+
+<!-- Button to trigger the modal -->
+<br>
+<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addGoalModal">
+  Add Goal
+</button>
 
 
 
