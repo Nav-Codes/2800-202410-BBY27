@@ -12,7 +12,7 @@ const { createHmac } = require('node:crypto');
 app.use(favicon(path.join(__dirname,'public','favicon.ico')));
 
 const session = require('express-session');
-const fs = require('fs');
+const fs = require('fs').promises;
 app.use(express.urlencoded({extended: false}));
 
 // Serve static files from the dist/exercises directory
@@ -659,8 +659,6 @@ function getRandomExercises(exercises, count) {
 
     return randomExercises;
 }
-
-const fs = require('fs').promises;
 
 app.get('/', async (req, res) => {
     if (req.session.authenticated) {
