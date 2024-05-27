@@ -59,14 +59,6 @@ document.getElementById('editPasswordForm').addEventListener('submit', function(
     })
 });
 
-document.getElementById('uploadProfilePictureForm').addEventListener('submit', function(e) {
-  const fileInput = document.getElementById('profilePictureInput');
-  if (!fileInput.value) {
-    e.preventDefault();
-    alert('Please select a file to upload.');
-  }
-});
-
 // Refresh the page when the modal closes
 $('#usernameSuccessModal').on('hide.bs.modal', function () {
     location.reload();

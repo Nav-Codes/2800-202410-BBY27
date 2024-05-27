@@ -234,57 +234,88 @@ app.post('/forgotpassword', async (req, res) => {
     }
 });
 
-app.post('/uploadProfilePicture', upload.single('profilePicture'), async (req, res) => {
+app.post(
+  "/uploadProfilePicture",
+  upload.single("profilePicture"), // Middleware for handling multipart/form-data, which is primarily used for uploading files
+  async (req, res) => {
+    // Check if the user is authenticated
     if (!req.session.authenticated) {
-        res.redirect('/login');
-        return;
+      // If not, redirect them to the login page
+      res.redirect("/login");
+      return;
     }
 
+    // Check if a file was uploaded
     if (req.file) {
-        const email = req.session.email;
-        const profilePicture = req.file.buffer;
+      // Extract the user's email and the uploaded file's buffer from the request
+      const email = req.session.email;
+      const profilePicture = req.file.buffer;
 
-        try {
-            // Update user document with profile picture
-            await userCollection.updateOne(
-                { email: email },
-                { $set: { profilePicture: profilePicture } }
-            );
-
-            res.redirect('/profile');
-        } catch (error) {
-            console.error('Error updating profile picture:', error);
-            res.status(500).send('Error updating profile picture');
-        }
-    } 
-});
-
-app.get('/profilePicture', async (req, res) => {
-    if (!req.session.authenticated) {
-        res.redirect('/login');
+      // Validate the email
+      if (typeof email !== "string" || email.length === 0) {
+        // If the email is invalid, send a 400 Bad Request response
+        res.status(400).send("Invalid email");
         return;
-    }
+      }
 
-    try {
-        const email = req.session.email;
-        const user = await userCollection.findOne(
-            { email: email },
-            { projection: { profilePicture: 1 } }
+      try {
+        // Update the user's document in the database to include the uploaded profile picture
+        await userCollection.updateOne(
+          { email: email },
+          { $set: { profilePicture: profilePicture } }
         );
 
-        if (user && user.profilePicture) {
-            res.set('Content-Type', 'image/jpeg');
-            res.send(user.profilePicture.buffer);
-        } else {
-            // Send a default placeholder image if no profile picture is found
-            res.redirect('https://via.placeholder.com/300');
-        }
-    } catch (error) {
-        console.error('Error fetching profile picture:', error);
-        res.status(500).send('Internal Server Error');
+        // Redirect the user to their profile page
+        res.redirect("/profile");
+      } catch (error) {
+        // If an error occurred while updating the user's document, log the error and send a 500 Internal Server Error response
+        console.error("Error updating profile picture:", error);
+        res.status(500).send("Error updating profile picture");
+      }
     }
-});
+  }
+);
+  
+app.get("/profilePicture", async (req, res) => {
+  // Check if the user is authenticated
+  if (!req.session.authenticated) {
+    // If not, redirect them to the login page
+    res.redirect("/login");
+    return;
+  }
 
+  // Extract the user's email from the session
+  const email = req.session.email;
+
+  // Validate the email
+  if (typeof email !== "string" || email.length === 0) {
+    // If the email is invalid, send a 400 Bad Request response
+    res.status(400).send("Invalid email");
+    return;
+  }
+
+  try {
+    // Retrieve the user's document from the database
+    const user = await userCollection.findOne(
+      { email: email },
+      { projection: { profilePicture: 1 } } // Only retrieve the profilePicture field
+    );
+
+    // Check if the user has a profile picture
+    if (user && user.profilePicture) {
+      // If they do, set the Content-Type header to 'image/jpeg' and send the profile picture
+      res.set("Content-Type", "image/jpeg");
+      res.send(user.profilePicture.buffer);
+    } else {
+      // If they don't, redirect to a default placeholder image
+      res.redirect("https://via.placeholder.com/300");
+    }
+  } catch (error) {
+    // If an error occurred while retrieving the user's document, log the error and send a 500 Internal Server Error response
+    console.error("Error fetching profile picture:", error);
+    res.status(500).send("Internal Server Error");
+  }
+});
 
 app.post('/editUser', async(req, res) => {
     let newUser = req.body.name;
@@ -296,8 +327,7 @@ app.post('/editUser', async(req, res) => {
     req.session.name = newUser;
 
     res.json({message: "Username Successfully Changed"});
-
-})
+});
 
 app.post('/editPass', async(req, res) => {
     let curr = req.body.curr;
@@ -318,12 +348,11 @@ app.post('/editPass', async(req, res) => {
     } else {
         res.json({message:"Invalid Current Password"});
     } 
-
-})
+});
 
 app.get('/editProfile', async (req,res) => {
     res.render('editProfile');
-})
+});
 
 
 app.post('/resetpassword/:token', async (req, res) => {
@@ -725,23 +754,39 @@ app.post('/search', async (req, res) => {
     res.redirect("/exercises/?filter=" + filter + "&search=" + search);
 });
 
-app.get('/ai', (req, res) => {
-    if (!req.session.authenticated) {
-        res.redirect('/login');
-        return;
-    } else {
-        res.render('ai');
-    }
+app.get("/ai", (req, res) => {
+  if (!req.session.authenticated) {
+    res.redirect("/login");
+    return;
+  } else {
+    res.render("ai");
+  }
 });
 
-app.post('/ai', async (req, res) => {
-    const line = req.body.line; // extracts the 'line' property from the request body
-    const response = await openai.chat.completions.create({ // sends request to OpenAI API to generate a response
-        model: 'gpt-3.5-turbo', 
-        messages: [{"role":"user", "content":line}], 
-        max_tokens: 20 
-    })
-    res.send(response['choices'][0]['message']['content'].trim()); 
+app.post("/ai", async (req, res) => {
+  // Extract the 'line' property from the request body
+  const line = req.body.line;
+
+  // Validate the input
+  if (typeof line !== "string" || line.length === 0) {
+    res.status(400).send("Invalid input");
+    return;
+  }
+
+  try {
+    // Send a request to the OpenAI API to generate a response
+    const response = await openai.chat.completions.create({
+      model: "gpt-3.5-turbo",
+      messages: [{ role: "user", content: line }],
+      max_tokens: 150,
+    });
+
+    // Send the generated response back to the client
+    res.send(response["choices"][0]["message"]["content"].trim());
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).send("An error occurred while generating a response");
+  }
 });
 
 // Function to select random exercises for the home page

@@ -1,159 +1,39 @@
-<%-include('templates/header');%>
-<div id="chat">
-  <form id="form0" onsubmit="event.preventDefault(); send(0);">
-    <div
-      class="fixed-bottom d-flex"
-      style="position: fixed; bottom: 0; width: 100%; padding: 10px"
-    >
-      <input
-        type="text"
-        id="userInput0"
-        class="form-control flex-grow-1"
-        placeholder="Question"
-        aria-label="Enter question"
-        aria-describedby="button-addon2"
-        autocomplete="off"
-      />
-      <button
-        class="btn btn-outline-secondary ml-2"
-        type="submit"
-        id="button-addon2"
-      >
-        Send
-      </button>
-    </div>
-  </form>
-</div>
+<%-include('templates /header');%>
+  <div id="chat">
+    <form id="form0" onsubmit="event.preventDefault(); send(0);">
+      <div class="fixed-bottom d-flex" style="position: fixed; bottom: 0; width: 100%; padding: 10px">
+        <input type="text" id="userInput0" class="form-control flex-grow-1" placeholder="Question"
+          aria-label="Enter question" aria-describedby="button-addon2" autocomplete="off" />
+        <button class="btn btn-outline-secondary ml-2" type="submit" id="button-addon2">
+          Send
+        </button>
+      </div>
+    </form>
+  </div>
 
-<!-- Modal -->
-<div
-  class="modal"
-  id="welcomeModal"
-  tabindex="-1"
-  aria-labelledby="welcomeModalLabel"
-  aria-hidden="true"
-  style="
+  <!-- Modal -->
+  <div class="modal" id="welcomeModal" tabindex="-1" aria-labelledby="welcomeModalLabel" aria-hidden="true" style="
     display: flex;
     justify-content: center;
     align-items: center;
     position: absolute;
     bottom: 30%;
     width: 100%;
-  "
->
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="welcomeModalLabel">Welcome</h5>
-        <button
-          type="button"
-          class="btn btn-light"
-          onclick="closeModal()"
-          aria-label="Close"
-        >
-          X
-        </button>
-      </div>
-      <div class="modal-body">
-        This is the AI assistant, I can help with any of your fitness related
-        questions! Please type your question in the input field below.
+  ">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="welcomeModalLabel">Welcome</h5>
+          <button type="button" class="btn btn-light" onclick="closeModal()" aria-label="Close">
+            X
+          </button>
+        </div>
+        <div class="modal-body">
+          This is the AI assistant, I can help with any of your fitness related
+          questions! Please type your question in the input field below.
+        </div>
       </div>
     </div>
   </div>
-</div>
-
-<script>
-  // Define a function to close the modal
-  function closeModal() {
-    document.getElementById("welcomeModal").style.display = "none";
-  }
-
-  // Define a function to send a message to the server
-  // Define a function to send a message to the server
-  function send(id) {
-    // Get the user's input from the input field with the corresponding id
-    const userInput = document.getElementById("userInput" + id).value;
-
-    // Check if the user's input is "Give me some motivation"
-    if (userInput.toLowerCase() === "give me some motivation") {
-      // Create a new div for the responsive embed
-      const embedDiv = document.createElement("div");
-      // Add Bootstrap classes to the div
-      embedDiv.className = "embed-responsive embed-responsive-16by9 mt-3";
-
-      embedDiv.style.maxWidth = "560px";
-      
-      // Create a new video element
-      const video = document.createElement("iframe");
-      // Set the source of the video to the YouTube embed link
-      video.src = "https://www.youtube.com/embed/ZXsQAXx_ao0";
-      // Set the video to autoplay
-      // video.setAttribute("allow", "autoplay");
-      // Add Bootstrap classes to the video
-      video.className = "embed-responsive-item";
-
-      // Append the video to the embed div
-      embedDiv.appendChild(video);
-
-      // Append the embed div to the 'chat' div
-      chat.appendChild(embedDiv);
-    }
-    // Check if the user's input is "I am eating a cookie"
-    else if (userInput.toLowerCase() === "i am eating a cookie") {
-      // Create a new div for the responsive embed
-      const embedDiv = document.createElement("div");
-      // Add Bootstrap classes to the div
-      embedDiv.className = "embed-responsive embed-responsive-16by9 mt-3";
-
-      embedDiv.style.maxWidth = "560px";
-      
-      // Create a new video element
-      const video = document.createElement("iframe");
-      // Set the source of the video to the YouTube embed link
-      video.src =
-        "https://www.youtube.com/embed/7HrnWC8zBcE?si=d5c624JBGk_H3cBz";
-      // Set the video to autoplay
-      // video.setAttribute("allow", "autoplay");
-      // Add Bootstrap classes to the video
-      video.className = "embed-responsive-item";
-
-      // Append the video to the embed div
-      embedDiv.appendChild(video);
-
-      // Append the embed div to the 'chat' div
-      chat.appendChild(embedDiv);
-    } else {
-      // Send a POST request to the '/ai' endpoint on the server
-      fetch("/ai", {
-        method: "POST",
-        headers: {
-          // Specify that the request body will be a JSON string
-          "Content-Type": "application/json",
-        },
-        // Set the request body to a JSON string that represents an object with a 'line' property
-        body: JSON.stringify({ line: userInput }),
-      })
-        .then((response) => response.text()) // Convert the server's response to text
-        .then((data) => {
-          // Get the 'chat' div
-          const chat = document.getElementById("chat");
-
-          // Create a new div for the AI's response
-          const responseDiv = document.createElement("div");
-          // Set the text content of the new div to the AI's response
-          responseDiv.textContent = "AI: " + data;
-          // Add Bootstrap classes to the new div
-          responseDiv.className = "alert alert-secondary mt-3";
-          // Append the new div to the 'chat' div
-          chat.appendChild(responseDiv);
-
-          // Clear the input field
-          document.getElementById("userInput" + id).value = "";
-
-          // Hide the modal
-          closeModal();
-        });
-    }
-  }
-</script>
-<%-include('templates/footer');%>
+  <script src="../public/js/ai.js"></script>
+  <%-include('templates /footer');%>
