@@ -45,12 +45,6 @@ const openai_api_key = process.env.OPENAI_API_KEY;
 const { OpenAI } = require('openai');
 const openai = new OpenAI(openai_api_key);
 
-const readline = require('readline');
-const userInterface = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout
-});
-
 const bodyParser = require('body-parser');
 app.use(bodyParser.json());
 
@@ -58,7 +52,6 @@ app.use(bodyParser.json());
 const bcrypt = require('bcrypt');
 
 const Joi = require("joi");
-const { scheduler } = require("timers/promises");
 
 //collections in database
 var {database} = include('databaseConnection.js');
@@ -69,7 +62,6 @@ const scheduleCollection = database.db(process.env.MONGODB_DATABASE).collection(
 const mongodb_host = process.env.MONGODB_HOST;
 const mongodb_user = process.env.MONGODB_USER;
 const mongodb_password = process.env.MONGODB_PASSWORD;
-const mongodb_database = process.env.MONGODB_DATABASE;
 const mongodb_session_secret = process.env.MONGODB_SESSION_SECRET;
 
 const node_session_secret = process.env.NODE_SESSION_SECRET;
@@ -550,6 +542,7 @@ app.post('/scheduleSearch/:day', async (req, res) => {
     res.redirect("/scheduleEditor/" + day + "?search=" + search);
 });
 
+//stores the name of the workout in the specified array in the schedules collection
 app.post('/scheduleSave', async (req, res) => {    
     let workout = req.body.newWorkout;
     let day = req.body.day;
@@ -558,19 +551,24 @@ app.post('/scheduleSave', async (req, res) => {
             .find({ email: req.session.email })
             .project({ [day]: 1 })
             .toArray();
-
-    if (req.body.adding) { //adding to database
+    
+    //adding to database
+    if (req.body.adding) { 
         if (currentWorkouts[0][day][0] == "No workouts") { //when adding to workout that is initially empty
             await scheduleCollection.updateOne({email : req.session.email}, {$pull : {[day] : "No workouts"}})
         }
         await scheduleCollection.updateOne({email : req.session.email}, {$push : {[day] : workout}});
-    } else { //removing from database
+    } 
+    
+    //removing from database
+    else { 
         await scheduleCollection.updateOne({email : req.session.email}, {$pull : {[day] : workout}});
+        //check if removing workout makes array empty
         currentWorkouts = await scheduleCollection
             .find({ email: req.session.email })
             .project({ [day]: 1 })
             .toArray();
-        if (currentWorkouts[0][day].length == 0) { //if removing workout makes array empty
+        if (currentWorkouts[0][day].length == 0) { 
             await scheduleCollection.updateOne({email : req.session.email}, {$push : {[day] : "No workouts"}});
         }
     }

@@ -15,15 +15,22 @@ function ajaxPOST(url, data, callback) {
     xhr.send(JSON.stringify(data));
 }
 
+//gets the day of the week that is being edited
 var myDay = document.getElementById('dayOfWeek').innerHTML;
 
-//place event listener out here and call function when the checkbox is pressed
+//event listener for when a checkbox is clicked on a workout
 var checkbox = document.querySelectorAll(".selectedWorkout").forEach(function(currentElement, currentIndex, listObj) {
     currentElement.addEventListener("click", function(e) {
         if (currentElement.checked) {
-            ajaxPOST('/scheduleSave', {newWorkout: currentElement.id, day : myDay, adding: true}, (val) => {console.log(val)});
+            //add workout to database
+            ajaxPOST('/scheduleSave', 
+            {newWorkout: currentElement.id, day : myDay, adding: true}, 
+            (val) => {console.log(val)});
         } else {
-            ajaxPOST('/scheduleSave', {newWorkout: currentElement.id, day : myDay, adding: false}, (val) => {console.log(val)});
+            //remove workout from database
+            ajaxPOST('/scheduleSave', 
+            {newWorkout: currentElement.id, day : myDay, adding: false}, 
+            (val) => {console.log(val)});
         }
     })
 });
