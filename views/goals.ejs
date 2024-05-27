@@ -84,7 +84,7 @@
                     <button type="button" class="btn btn-danger btn-sm delete-goal-btn" data-toggle="modal" data-target="#confirmationModal">Delete Goal</button>
                 </form>     
                 <div class="custom-control custom-checkbox mt-2">
-                    <input type="checkbox" class="custom-control-input" id="trackGoal<%= index %>" <%= item[4] ? 'tracked' : '' %>>
+                    <input type="checkbox" class="custom-control-input" id="trackGoal<%= index %>" <%= item[4] === true ? 'checked' : '' %>>
                     <label class="custom-control-label" for="trackGoal<%= index %>">Track Goal</label>
                 </div>         
               </div>
@@ -147,15 +147,6 @@
             track.push(isTracked);
 
             ajaxPOST('/trackGoal', {track: track});
-            // $.ajax({
-            //     url: '/trackGoal',
-            //     method: 'POST',
-            //     contentType: 'application/json',
-            //     data: JSON.stringify({
-            //         goalIndex: goalIndex,
-            //         isTracked: isTracked
-            //     }),
-            // });
         });
     });
 </script>
