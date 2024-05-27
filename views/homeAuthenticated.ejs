@@ -77,31 +77,50 @@
         Goals
         <!-- https://www.youtube.com/watch?v=Ll5f0jGIqa4 -->
 
-        <!-- Progress Bar -->
-        <div class="progress-container">
-            <div class="progress">
-                <div class="progress-done"></div>
-            </div>
+        <!-- Iterate through each goal -->
+        <% if (result && result.goal && result.goal.length > 0) { %>
+            <% let hasGoals = false; %>
+            <% result.goal.forEach((goal, index) => { %>
+                <% if (goal[4]) { %>
+                    <!-- Progress Bar -->
+                    <div class="progress-container<%= index %>">
+                        <div class="progress">
+                            <div class="progress-done progress-done<%= index %>"></div>
+                        </div>
+                        <div>
+                            <h3><%= goal[2] %></h3>
+                            <p><%= goal[3] %> <%= goal[1] %> / <%= goal[0] %> <%= goal[1] %> completed!</p>
+                        </div>
+                    </div>
+                    <script>
+                        // Embed JavaScript code here
+                        function updateProgressBar<%= index %>() {
+                            const progress = document.querySelector('.progress-done.progress-done<%= index %>');
+                            const randomGoal = <%- JSON.stringify(goal) %>;
+                            const finalValue = randomGoal[3];
+                            const maxValue = randomGoal[0];
+                            if (maxValue > 0) {
+                                const widthPercentage = (finalValue / maxValue) * 100;
+                                progress.style.width = `${widthPercentage}%`;
+                                progress.innerText = `${Math.ceil(widthPercentage)}%`;
+                            }
+                        }
 
-            <% if (result && result.goal && result.goal.length > 0) { %>
-                <% const randomGoal = result.goal[Math.floor(Math.random() * result.goal.length)]; %>
-                <div>
-                    <h3><%= randomGoal[2] %></h3>
-                    <p><%= randomGoal[3] %> out of <%= randomGoal[0] %> completed!</p>
-                </div>
-                <script>
-                    var randomGoal = <%- JSON.stringify(randomGoal) %>;
-                </script>
-            <% } else { %>
-                <h3> You have no goals yet!</h3>
-                <script>
-                    var randomGoal = null;
-                </script>
+                        // Initial render
+                        updateProgressBar<%= index %>();
+                    </script>
+                    <% hasGoals = true; %>
+                <% } %>
+            <% }); %>
+            <% if (!hasGoals) { %>
+                <h3> You have no tracked goals yet!</h3>
             <% } %>
-        </div>
+        <% } else { %>
+            <h3> You have no tracked goals yet!</h3>
+        <% } %>
     </div>
-    <script src="/public/js/goalsHome.js"></script>
 </a>
+
 
 <a href="/schedule">
     <div class="rectangle box-shadow-3d" style="background-color: #A8EEE1;">
