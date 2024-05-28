@@ -1,7 +1,7 @@
-<%-include('templates /header');%>
+<%-include('templates/header');%>
   <div id="chat">
     <form id="form0" onsubmit="event.preventDefault(); send(0);">
-      <div class="fixed-bottom d-flex" style="position: fixed; bottom: 0; width: 100%; padding: 10px">
+      <div class="fixed-bottom d-flex" style="position: fixed; bottom: 8vh; width: 100vw; padding: 10px">
         <input type="text" id="userInput0" class="form-control flex-grow-1" placeholder="Question"
           aria-label="Enter question" aria-describedby="button-addon2" autocomplete="off" />
         <button class="btn btn-outline-secondary ml-2" type="submit" id="button-addon2">
@@ -36,4 +36,4 @@
     </div>
   </div>
   <script src="../public/js/ai.js"></script>
-  <%-include('templates /footer');%>
+  <%-include('templates/footer');%>
