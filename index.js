@@ -156,7 +156,7 @@ app.post('/submitUser', async (req,res) => {
         //create sample workout schedule that contain empty for each day of the week
         createSchedule(email);
     
-        //temp redirect till homepage complete.
+        //Redirects to homepage
         res.redirect("/");
     } else {
         // Check for duplicate email or name
