@@ -277,7 +277,7 @@ app.get('/profilePicture', async (req, res) => {
 });
 
 
-app.post('/editUsername', async(req, res) => {
+app.post('/editUser', async(req, res) => {
     let newUser = req.body.name;
 
     let user = req.session.email;
@@ -290,7 +290,7 @@ app.post('/editUsername', async(req, res) => {
 
 })
 
-app.post('/editPassword', async(req, res) => {
+app.post('/editPass', async(req, res) => {
     let curr = req.body.curr;
     let newPass = req.body.newPass;
 
