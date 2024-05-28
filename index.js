@@ -157,7 +157,7 @@ app.post('/submitUser', async (req,res) => {
         createSchedule(email);
     
         //temp redirect till homepage complete.
-        res.redirect("/profile");
+        res.redirect("/");
     } else {
         // Check for duplicate email or name
         const existingUser = result.find(user => user.email === email || user.name === name);
