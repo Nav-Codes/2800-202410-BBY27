@@ -190,7 +190,6 @@ app.post('/forgotpassword', async (req, res) => {
 	if (result.length != 1) {
         console.log("Email doesn't exist");
         res.json({status:"error", message:"Thank you for submitting your request. If a valid email was used, an email will be sent to that account. Please check your inbox for further information."});
-        // res.redirect("/login");
 		return;
 	}
 
@@ -278,7 +277,7 @@ app.get('/profilePicture', async (req, res) => {
 });
 
 
-app.post('/editUser', async(req, res) => {
+app.post('/editUsername', async(req, res) => {
     let newUser = req.body.name;
 
     let user = req.session.email;
@@ -291,7 +290,7 @@ app.post('/editUser', async(req, res) => {
 
 })
 
-app.post('/editPass', async(req, res) => {
+app.post('/editPassword', async(req, res) => {
     let curr = req.body.curr;
     let newPass = req.body.newPass;
 
