@@ -21,10 +21,16 @@ document.getElementById('editUsernameForm').addEventListener('submit', function(
     event.preventDefault();
 
     const name = document.getElementById('usernameInput').value;
+    const usernameError = document.getElementById('usernameError');
+    usernameError.textContent = '';
 
     if (!name.trim()) {
-        let modalBody = document.querySelector(".modal-body-user");
-        modalBody.innerHTML =  'Username cannot be empty.'
+        usernameError.textContent = 'Username cannot be empty.';
+        return;
+    }
+
+    if (name.length > 15) {
+        usernameError.textContent = 'Username cannot be more than 15 characters long.';
         return;
     }
 
@@ -44,12 +50,27 @@ document.getElementById('editPasswordForm').addEventListener('submit', function(
      // Get the form data
      const curpassword = document.getElementById('currentPasswordInput').value;
      const newPass = document.getElementById('newPasswordInput').value;
-
-     if (!curpassword.trim() || !newPass.trim()) {
-        let modalBody = document.querySelector(".modal-body-pass");
-        modalBody.innerHTML = 'Current password and new password fields cannot be empty.'
-        return;
-    }
+     const currentPasswordError = document.getElementById('currentPasswordError');
+     const newPasswordError = document.getElementById('newPasswordError');
+ 
+     currentPasswordError.textContent = '';
+     newPasswordError.textContent = '';
+ 
+     if (!curpassword.trim()) {
+         currentPasswordError.textContent = 'Current password cannot be empty.';
+         return;
+     }
+ 
+     if (!newPass.trim()) {
+         newPasswordError.textContent = 'New password cannot be empty.';
+         return;
+     }
+ 
+     if (newPass.length < 8) {
+         newPasswordError.textContent = 'New password must be at least 8 characters long.';
+         return;
+     }
+ 
 
     ajaxPOST("/editPass",{curr: curpassword, newPass: newPass}, function(response){
         let parsedResponse = JSON.parse(response);
@@ -68,10 +89,15 @@ document.getElementById('uploadProfilePictureForm').addEventListener('submit', f
 });
 
 // Refresh the page when the modal closes
-$('#usernameSuccessModal').on('hide.bs.modal', function () {
-    location.reload();
-});
+document.addEventListener('DOMContentLoaded', function () {
+    var usernameSuccessModal = document.getElementById('usernameSuccessModal');
+    var passwordSuccessModal = document.getElementById('passwordSuccessModal');
 
-$('#passwordSuccessModal').on('hide.bs.modal', function () {
-    location.reload();
+    usernameSuccessModal.addEventListener('hidden.bs.modal', function () {
+        location.reload();
+    });
+
+    passwordSuccessModal.addEventListener('hidden.bs.modal', function () {
+        location.reload();
+    });
 });
