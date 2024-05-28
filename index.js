@@ -451,15 +451,14 @@ app.get('/schedule', async (req, res) => {
 });
 
 app.get('/scheduleEditor/:day', async (req, res) => {
-    //gets workout schedule based on unique email  
-
     if (!req.session.authenticated) {
         res.redirect('/login');
         return;
     }
+
+    //used to validate day passed into params
     var day = req.params.day;
     let gotActualDay = false;
-
     const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
     for (let i = 0; i < daysOfWeek.length; i++) {
         if (daysOfWeek[i] == day) {
@@ -469,6 +468,7 @@ app.get('/scheduleEditor/:day', async (req, res) => {
     }
 
     if (gotActualDay) {
+        //gets the workout for the specified day
         const workouts = await scheduleCollection
             .find({ email: req.session.email })
             .project({ [day]: 1 })
@@ -488,6 +488,7 @@ app.get('/scheduleEditor/:day', async (req, res) => {
                 // Parse the JSON data
                 let jsonData = JSON.parse(data);
                 
+                //used to get full details of workouts currently in list
                 let workoutData = jsonData;
 
                 if (req.query.search != null) {
@@ -500,7 +501,7 @@ app.get('/scheduleEditor/:day', async (req, res) => {
                     jsonData = jsonData.filter(item => item.level == req.query.filter);
                 }
 
-                //get ids of workouts for given day
+                //get all the info about the current days exercise; used for linking the exercise to its full page 
                 let workoutIDs = [];
                 for (let i = 0; i < workouts[0][day].length; i++) {
                     for (let j = 0; j < workoutData.length; j++) {
@@ -536,6 +537,7 @@ app.get('/scheduleEditor/:day', async (req, res) => {
 });
 
 app.post('/scheduleSearch/:day', async (req, res) => {
+    //gets the string from the search bar and compares it with the titles of each exercise 
     let search = req.body.search;
     let day = req.params.day;
     res.redirect("/scheduleEditor/" + day + "?search=" + search);
@@ -553,7 +555,9 @@ app.post('/scheduleSave', async (req, res) => {
     
     //adding to database
     if (req.body.adding) { 
-        if (currentWorkouts[0][day][0] == "No workouts") { //when adding to workout that is initially empty
+        
+        //when adding to workout that is initially empty
+        if (currentWorkouts[0][day][0] == "No workouts") { 
             await scheduleCollection.updateOne({email : req.session.email}, {$pull : {[day] : "No workouts"}})
         }
         await scheduleCollection.updateOne({email : req.session.email}, {$push : {[day] : workout}});
@@ -796,9 +800,8 @@ app.get('/', async (req, res) => {
             const result = await userCollection.findOne({ email: req.session.email });
             console.log(result);
 
-            //get the id's of the current days workouts
+            //get all the info about the current days exercise; used for linking the exercise to its full page 
             let workoutIDs = [];
-
             for (let i = 0; i < todaysWorkouts[0][today].length; i++) {
                 for (let j = 0; j < jsonData.length; j++) {
                     if (todaysWorkouts[0][today][i] == jsonData[j].name) {
