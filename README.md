@@ -42,37 +42,37 @@ Node modules and other technologies:
 
 # Files
 - +---dist
-- |   \---exercises.json
+- - |   \---exercises.json
 - +---exercises
 - +---node_modules
 - +---public
-- |   +---css
-- |   |   \---homeAuthenticated
-- |   \---js
-- |       +---accountRetrieval.js
-- |       +---editProfile.js 
-- |       +---goalsHome.js
-- |       \---schedule.js
+- - |   +---css
+- - - |   |   \---homeAuthenticated
+- - |   \---js
+- - - |       +---accountRetrieval.js
+- - - |       +---editProfile.js 
+- - - |       +---goalsHome.js
+- - - |       \---schedule.js
 - +---views
-- |   +---404.ejs 
-- |   +---ai.ejs
-- |   +---editProfile.ejs
-- |   +---exercise.ejs
-- |   +---exerciselist.ejs 
-- |   +---goals.ejs 
-- |   +---homeAuthenticated.ejs 
-- |   +---homeUnauthenticated.ejs 
-- |   +---loginForm.ejs 
-- |   +---passwordReset.ejs
-- |   +---schedule.ejs 
-- |   +---scheduleEditor.ejs 
-- |   +---signUpForm.ejs 
-- |   +---userProfile.ejs   
-- |   \---templates
-- |        +---footer.ejs
-- |        +---header.ejs
-- |        +---modalEditor.ejs
-- |        \---navbar.ejs
+- - |   +---404.ejs 
+- - |   +---ai.ejs
+- - |   +---editProfile.ejs
+- - |   +---exercise.ejs
+- - |   +---exerciselist.ejs 
+- - |   +---goals.ejs 
+- - |   +---homeAuthenticated.ejs 
+- - |   +---homeUnauthenticated.ejs 
+- - |   +---loginForm.ejs 
+- - |   +---passwordReset.ejs
+- - |   +---schedule.ejs 
+- - |   +---scheduleEditor.ejs 
+- - |   +---signUpForm.ejs 
+- - |   +---userProfile.ejs   
+- - |   \---templates
+- - - |        +---footer.ejs
+- - - |        +---header.ejs
+- - - |        +---modalEditor.ejs
+- - - |        \---navbar.ejs
 - +---.env
 - +---.gitignore
 - +---databaseConnection.js
@@ -136,7 +136,7 @@ Testing spreadsheet: https://docs.google.com/spreadsheets/d/1ykLde51TMumc67eQ14d
 
 # Contact
 - Matt: matthew_dodd_94@hotmail.com
- Dan: didacdan@gmail.com
+- Dan: didacdan@gmail.com
 - Alenn: gauttieralenndupaya@gmail.com
 - Bryan: ble16@my.bcit.ca
 - Navjot: navjotkehal5@gmail.com
