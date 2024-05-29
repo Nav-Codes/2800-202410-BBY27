@@ -13,7 +13,7 @@ const multer = require("multer");
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
-app.use(favicon(path.join(__dirname, "public", "favicon.ico")));
+app.use(favicon(path.join(__dirname, "public", "images", "favicon.ico")));
 
 const session = require("express-session");
 const fs = require("fs");
