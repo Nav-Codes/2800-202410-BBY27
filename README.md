@@ -41,18 +41,28 @@ Node modules and other technologies:
 - serve-favicon --------------version 2.5.0
 
 # Files
-+---dist
-|   \---exercises.json
-+---exercises
 +---node_modules
 +---public
 |   +---css
-|   |   \---homeAuthenticated
+|   |   +---editProfile.css
+|   |   +---header.css
+|   |   +---homeAuthenticated.css
+|   |   +---homeUnauthenticated.css
+|   |   +---loginForm.css
+|   |   +---signUpForm.css
+|   |   \---userProfile.css
+|   \---images
+|   |   +---exercises
+|   |   \---favicon.ico
 |   \---js
-|       +---accountRetrieval.js
-|       +---editProfile.js 
-|       +---goalsHome.js
-|       \---schedule.js
+|   |   +---accountRetrieval.js
+|   |   +---ai.js
+|   |   +---editProfile.js 
+|   |   +---goals.js
+|   |   +---goalsHome.js
+|   |   \---schedule.js
+|   \---json
+|       \---exercises.json
 +---views
 |   +---404.ejs 
 |   +---ai.ejs
@@ -72,7 +82,8 @@ Node modules and other technologies:
 |        +---footer.ejs
 |        +---header.ejs
 |        +---modalEditor.ejs
-|        \---navbar.ejs
+|        +---navbar.ejs
+|        \---navfooter.ejs
 +---.env
 +---.gitignore
 +---databaseConnection.js
