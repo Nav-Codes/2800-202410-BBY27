@@ -768,7 +768,7 @@ function getRandomExercises(exercises, count) {
 
 app.get('/', async (req, res) => {
     if (req.session.authenticated) {
-        //Credit: w3schools - create an array with all week day names, 
+        //Credit: w3schools: https://www.w3schools.com/jsref/jsref_getday.asp 
         //use date object to get current day, and use number returned to access day from array
         const weekday = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
         const d = new Date();
