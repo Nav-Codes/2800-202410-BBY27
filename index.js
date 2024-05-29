@@ -208,8 +208,19 @@ app.post('/forgotpassword', async (req, res) => {
         await transporter.sendMail({
             from: 'wefitpass@gmail.com',
             to: email,
-            subject: 'AccountInfo',
-            text: `link: ${resetLink}`
+            subject: 'WeFit Password Reset',
+            html: `
+                <p>Click the following link to reset your password:</p>
+                <a href="${resetLink}">Reset Password</a>
+                <p>If you did not request a password reset, please ignore this email.</p>
+                <a href="https://two800-202410-bby27.onrender.com/"><img src="cid:WeFitLogo" alt="WeFit Logo" style="width: 300px; height: 100px"></a>
+            `,
+            //Credit: ChatGPT - use a cid to display the image in the email and use the attatchments option from sendMail function to include the image
+            attachments: [{
+                filename: 'WeFitLogo.png',
+                path: path.join(__dirname, '/public/WeFitLogo.png'),
+                cid: 'WeFitLogo' // same cid value as in the html img src
+            }]
             });
 
         res.json({status:"success", message:"Thank you for submitting your request. If a valid email was used, an email will be sent to that account. Please check your inbox for further information."});
