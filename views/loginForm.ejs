@@ -1,6 +1,7 @@
 <%- include("templates/header"); %>
+<link rel="stylesheet" href="../public/CSS/loginForm.css">
 
-<div style="display: flex; justify-content: center; align-items: center; flex-direction: column; border-color: black; border-style: solid; border-width: 5%;">
+<div style="display: flex;align-items: center; flex-direction: column;">
 
     <% if (error.userNoExist === 1) { %>
         <h3 style='color:red'>User Does Not Exist</h3>
@@ -11,7 +12,7 @@
         <h3 style='color:red'>Incorrect Email or Password</h3>
     <% } %>
 
-    <form action="/loggingin" method="post" style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
+    <form id="form" action="/loggingin" method="post" style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
         <div class="form-group">
             <div class="form-group" style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
                 <label for="exampleInputEmail1">Email address</label>

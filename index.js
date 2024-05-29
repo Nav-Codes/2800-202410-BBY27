@@ -125,7 +125,6 @@ app.post('/submitUser', async (req,res) => {
 	
 	const validationResult = schema.validate({email, password, name});
 	if (validationResult.error != null) {
-	   console.log(validationResult.error);
 	   res.render("signUpForm",{duplicate: 0, InvalidField: 1})
 	   return;
    }
@@ -137,7 +136,6 @@ app.post('/submitUser', async (req,res) => {
     if (!result || result.length === 0) {
         // No user found with the given email
         await userCollection.insertOne({ email: email, password: hashedPassword, name: name });
-        console.log("Inserted user");
     
         // Set user details in the session
         req.session.authenticated = true;
@@ -158,7 +156,6 @@ app.post('/submitUser', async (req,res) => {
         } else {
             // No duplicate found, insert new user
             await userCollection.insertOne({ email: email, password: hashedPassword, name: name });
-            console.log("Inserted user");
     
             // Set user details in the session
             req.session.authenticated = true;
@@ -188,7 +185,6 @@ app.post('/forgotpassword', async (req, res) => {
     const result = await userCollection.find({email: email}).project({email: 1, password: 1, name: 1, _id: 1}).toArray();
 
 	if (result.length != 1) {
-        console.log("Email doesn't exist");
         res.json({status:"error", message:"Thank you for submitting your request. If a valid email was used, an email will be sent to that account. Please check your inbox for further information."});
 		return;
 	}
@@ -395,7 +391,6 @@ app.post('/loggingin', async (req,res) => {
 
 	const result = await userCollection.find({email: email}).project({email: 1, password: 1, name: 1, _id: 1}).toArray();
 
-	console.log(result);
 	if (result.length != 1) {
         res.render("loginForm", { error: { userNoExist: 1, EmailNotEnt: 0, Wrong: 0 } });
 		return;
@@ -404,7 +399,6 @@ app.post('/loggingin', async (req,res) => {
     const user = result[0];
 
 	if (await bcrypt.compare(password, result[0].password)) {
-		console.log("correct password");
 		req.session.authenticated = true;
 		req.session.email = user.email;
         req.session.name = user.name;
