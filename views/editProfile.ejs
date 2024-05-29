@@ -2,41 +2,54 @@
 
 <link rel="stylesheet" href="../public/CSS/editProfile.css">
 
-<div class="container text-center">
-  <form id="uploadProfilePictureForm" action="/uploadProfilePicture" method="post" enctype="multipart/form-data">
-    <div class="form-group">
-      <label for="profilePictureInput">Profile Picture</label>
-      <input name="profilePicture" type="file" class="form-control" id="profilePictureInput">
+<div class="container text-center mt-5">
+  <div class="row justify-content-center mb-4">
+    <div class="col-md-6">
+      <form id="uploadProfilePictureForm" action="/uploadProfilePicture" method="post" enctype="multipart/form-data" class="mb-4">
+        <div class="form-group">
+          <label for="profilePictureInput">Profile Picture</label>
+          <input name="profilePicture" type="file" class="form-control-file" id="profilePictureInput">
+        </div>
+        <button type="submit" class="btn btn-primary">Upload Profile Picture</button>
+      </form>
     </div>
-    <button type="submit" class="btn btn-primary">Upload Profile Picture</button>
-  </form>
+  </div>
 
-  <form id="editUsernameForm">
-      <div class="form-group">
-        <label for="usernameInput">New UserName</label>
-        <input name="name" type="text" class="form-control" id="usernameInput" aria-describedby="usernameHelp" placeholder="Enter new username">
-        <div id="usernameError" class="error-message"></div>
-      </div>
-      <button type="submit" class="btn btn-primary">Submit</button>
-  </form>
+  <div class="row justify-content-center mb-4">
+    <div class="col-md-6">
+      <form id="editUsernameForm" action="/editUsername" method="post" class="mb-4">
+        <div class="form-group">
+          <label for="usernameInput">New Username</label>
+          <input name="name" type="text" class="form-control" id="usernameInput" placeholder="Enter new username">
+          <div id="usernameError" class="invalid-feedback"></div>
+        </div>
+        <button type="submit" class="btn btn-primary ">Submit</button>
+        <button type="reset" class="btn btn-primary ">Reset</button>
+      </form>
+    </div>
+  </div>
 
-  <form id="editPasswordForm">
-      <div class="form-group">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <form id="editPasswordForm" action="/editPassword" method="post" class="mb-4">
+        <div class="form-group">
           <label for="currentPasswordInput">Enter Current Password</label>
-          <input name="curpassword" type="password" class="form-control" id="currentPasswordInput" aria-describedby="currentPasswordHelp">
-          <div id="currentPasswordError" class="error-message"></div>
-      </div>
-      <div class="form-group">
-        <label for="newPasswordInput">Enter New Password</label>
-        <input name="newPass" type="password" class="form-control" id="newPasswordInput" aria-describedby="newPasswordHelp">
-        <div id="newPasswordError" class="error-message"></div>
-      </div>
-      <button type="submit" class="btn btn-primary">Submit</button>
-  </form>
+          <input name="curpassword" type="password" class="form-control" id="currentPasswordInput">
+          <div id="currentPasswordError" class="invalid-feedback"></div>
+        </div>
+        <div class="form-group">
+          <label for="newPasswordInput">Enter New Password</label>
+          <input name="newPass" type="password" class="form-control" id="newPasswordInput">
+          <div id="newPasswordError" class="invalid-feedback"></div>
+        </div>
+        <button type="submit" class="btn btn-primary ">Submit</button>
+        <button type="reset" class="btn btn-primary ">Reset</button>
+      </form>
+    </div>
+  </div>
 </div>
 
 <script src="../public/js/editProfile.js"></script>
 
-
-<%- include('templates/modalEdit')  %>
-<%-include('templates/footer');%>
+<%- include('templates/modalEdit') %>
+<%- include('templates/footer'); %>

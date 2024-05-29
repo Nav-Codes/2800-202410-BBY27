@@ -110,7 +110,7 @@ function createSchedule(email) {
     });
     console.log('created empty schedule');
 }
-
+// standard user submission from web dev
 app.post('/submitUser', async (req,res) => {
     var email = req.body.email;
     var name = req.body.name;
@@ -118,7 +118,7 @@ app.post('/submitUser', async (req,res) => {
 
 	const schema = Joi.object(
 		{
-			name: Joi.string().max(50).required(),
+			name: Joi.string().max(15).pattern(/^[a-zA-Z0-9]*$/, 'alphanumeric').required(),
             email: Joi.string().email().required(),
             password: Joi.string().max(20).required()
 		});

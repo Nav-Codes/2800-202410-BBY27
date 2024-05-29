@@ -10,7 +10,7 @@ align-items: center; flex-direction: column;">
 <% } else if (InvalidField === 1){ %>
   <h3 style='color:red'>Please Enter a Valid Field</h3>
   <% } %>
-<form id="userForm" action="/submitUser" method="post" style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
+<form id="userForm" action="/submitUser" method="post" style="display: flex; justify-content: center; align-items: center;">
   <div class="form-group" style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
     <label>Username</label>
     <input name="name" type="text" class="form-control"
@@ -26,7 +26,10 @@ align-items: center; flex-direction: column;">
       <input name="password" type="password" 
       class="form-control" id="exampleInputPassword1" placeholder="Password">
     </div>
-    <button type="submit">Confirm</button>
+    <div style="display: flex; flex-direction: row;">
+    <button type="submit" class="btn btn-primary">Confirm</button>
+    <button type="reset" class="btn btn-primary">Reset</button>
+    </div>
 </form>
 
 </div>
