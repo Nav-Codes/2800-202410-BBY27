@@ -120,7 +120,7 @@ Testing spreadsheet: https://docs.google.com/spreadsheets/d/1ykLde51TMumc67eQ14d
 - Workout explorer that allows you to search workouts by workout name and filter workouts by difficulty
 
 # AI
-- a. We used AI to help develop parts of the web app. We would explain to ChatGPT about a specific issue we were running into like a bug and ask it to recommend a fix for it. We would also ask it to develop ways to implement a certain part of a feature like how to use a post method to change the schedule database. It would mainly be a way to get unstuck from a problem that we could not figure out. 
+- a. We used AI to help develop parts of the web app. We would explain to ChatGPT about a specific issue we were running into like a bug and ask it to recommend a fix for it. We would also ask it to develop ways to implement a certain part of a feature like how check off workouts that are already in your workout list using ejs. It would mainly be a way to get unstuck from a problem that we could not figure out. 
 - b.  We did not use ChatGPT to create or clean data sets. 
 - c. Our app uses the ChatGPT 3.5 turbo API. There is essentially a five step process that goes into the functionality of the AI: 
     1. We take the user input and send it over to the server as JSON data.
