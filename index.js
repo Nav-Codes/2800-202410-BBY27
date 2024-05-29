@@ -606,6 +606,29 @@ app.post('/scheduleSave', async (req, res) => {
     res.redirect('/scheduleEditor/' + day)
 });
 
+app.post('/trackGoal', async (req, res) => {
+    const { track } = req.body;
+
+    if (track && Array.isArray(track) && track.length === 2) {
+        const [goalIndex, isTracked] = track;
+
+        try {
+            const updateQuery = {};
+            updateQuery[`goal.${goalIndex}.4`] = isTracked;
+
+            await userCollection.updateOne({ email: req.session.email }, { $set: updateQuery });
+            res.sendStatus(200);
+        } catch (error) {
+            console.error(error);
+            res.status(500).send("Internal Server Error");
+        }
+    } else {
+        res.status(400).send("Bad Request: 'track' data is invalid");
+    }
+});
+
+
+
 app.get('/goals', async (req, res) => {
     if (!req.session.authenticated) {
         res.redirect('/login');
