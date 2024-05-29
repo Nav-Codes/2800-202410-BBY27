@@ -75,7 +75,6 @@ Node modules and other technologies:
 |        \---navbar.ejs
 +---.env
 +---.gitignore
-+---api_test.js
 +---databaseConnection.js
 +---index.js
 +---package-lock.json
