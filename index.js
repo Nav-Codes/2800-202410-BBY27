@@ -598,7 +598,14 @@ app.post('/scheduleSave', async (req, res) => {
             await scheduleCollection.updateOne({email : req.session.email}, {$push : {[day] : "No workouts"}});
         }
     }
-    res.redirect('/scheduleEditor/' + day)
+    res.redirect('/scheduleEditor/' + day);
+});
+
+app.post('/scheduleClear', async (req, res) => {
+    //clears list of workouts for given day by setting the array to default value of No workouts
+    let emptyWorkoutArray = ["No workouts"];
+    await scheduleCollection.updateOne({email : req.session.email}, {$set : {[req.body.day] : emptyWorkoutArray}});
+    res.redirect('/scheduleEditor/' + req.body.day)
 });
 
 app.post('/trackGoal', async (req, res) => {
