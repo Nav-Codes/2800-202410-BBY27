@@ -304,7 +304,7 @@ app.get("/profilePicture", async (req, res) => {
   }
 });
 
-app.post('/editUser', async(req, res) => {
+app.post('/editUsername', async(req, res) => {
     let newUser = req.body.name;
 
     let user = req.session.email;
@@ -316,7 +316,7 @@ app.post('/editUser', async(req, res) => {
     res.json({message: "Username Successfully Changed"});
 });
 
-app.post('/editPass', async(req, res) => {
+app.post('/editPassword', async(req, res) => {
     let curr = req.body.curr;
     let newPass = req.body.newPass;
 
@@ -566,7 +566,7 @@ app.post('/scheduleSearch/:day', async (req, res) => {
     res.redirect("/scheduleEditor/" + day + "?search=" + search);
 });
 
-//stores the name of the workout in the specified array in the schedules collection
+//adds or removes the name of the workout in the specified array in the schedules collection
 app.post('/scheduleSave', async (req, res) => {    
     let workout = req.body.newWorkout;
     let day = req.body.day;

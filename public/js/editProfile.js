@@ -34,7 +34,7 @@ document.getElementById('editUsernameForm').addEventListener('submit', function(
         return;
     }
 
-    ajaxPOST("/editUser",{name: name}, function(response){
+    ajaxPOST("/editUsername",{name: name}, function(response){
         let parsedResponse = JSON.parse(response);
         let modalBody = document.querySelector(".modal-body-user");
         modalBody.innerHTML = parsedResponse.message;
@@ -72,7 +72,7 @@ document.getElementById('editPasswordForm').addEventListener('submit', function(
      }
  
 
-    ajaxPOST("/editPass",{curr: curpassword, newPass: newPass}, function(response){
+    ajaxPOST("/editPassword",{curr: curpassword, newPass: newPass}, function(response){
         let parsedResponse = JSON.parse(response);
         let modalBody = document.querySelector(".modal-body-pass");
         modalBody.innerHTML = parsedResponse.message;
