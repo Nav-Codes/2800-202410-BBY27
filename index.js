@@ -45,12 +45,6 @@ const openai_api_key = process.env.OPENAI_API_KEY;
 const { OpenAI } = require('openai');
 const openai = new OpenAI(openai_api_key);
 
-const readline = require('readline');
-const userInterface = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout
-});
-
 const bodyParser = require('body-parser');
 app.use(bodyParser.json());
 
@@ -58,7 +52,6 @@ app.use(bodyParser.json());
 const bcrypt = require('bcrypt');
 
 const Joi = require("joi");
-const { scheduler } = require("timers/promises");
 
 //collections in database
 var {database} = include('databaseConnection.js');
@@ -69,7 +62,6 @@ const scheduleCollection = database.db(process.env.MONGODB_DATABASE).collection(
 const mongodb_host = process.env.MONGODB_HOST;
 const mongodb_user = process.env.MONGODB_USER;
 const mongodb_password = process.env.MONGODB_PASSWORD;
-const mongodb_database = process.env.MONGODB_DATABASE;
 const mongodb_session_secret = process.env.MONGODB_SESSION_SECRET;
 
 const node_session_secret = process.env.NODE_SESSION_SECRET;
@@ -198,7 +190,6 @@ app.post('/forgotpassword', async (req, res) => {
 	if (result.length != 1) {
         console.log("Email doesn't exist");
         res.json({status:"error", message:"Thank you for submitting your request. If a valid email was used, an email will be sent to that account. Please check your inbox for further information."});
-        // res.redirect("/login");
 		return;
 	}
 
@@ -489,15 +480,14 @@ app.get('/schedule', async (req, res) => {
 });
 
 app.get('/scheduleEditor/:day', async (req, res) => {
-    //gets workout schedule based on unique email  
-
     if (!req.session.authenticated) {
         res.redirect('/login');
         return;
     }
+
+    //used to validate day passed into params
     var day = req.params.day;
     let gotActualDay = false;
-
     const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
     for (let i = 0; i < daysOfWeek.length; i++) {
         if (daysOfWeek[i] == day) {
@@ -507,6 +497,7 @@ app.get('/scheduleEditor/:day', async (req, res) => {
     }
 
     if (gotActualDay) {
+        //gets the workout for the specified day
         const workouts = await scheduleCollection
             .find({ email: req.session.email })
             .project({ [day]: 1 })
@@ -526,6 +517,7 @@ app.get('/scheduleEditor/:day', async (req, res) => {
                 // Parse the JSON data
                 let jsonData = JSON.parse(data);
                 
+                //used to get full details of workouts currently in list
                 let workoutData = jsonData;
 
                 if (req.query.search != null) {
@@ -538,7 +530,7 @@ app.get('/scheduleEditor/:day', async (req, res) => {
                     jsonData = jsonData.filter(item => item.level == req.query.filter);
                 }
 
-                //get ids of workouts for given day
+                //get all the info about the current days exercise; used for linking the exercise to its full page 
                 let workoutIDs = [];
                 for (let i = 0; i < workouts[0][day].length; i++) {
                     for (let j = 0; j < workoutData.length; j++) {
@@ -574,11 +566,13 @@ app.get('/scheduleEditor/:day', async (req, res) => {
 });
 
 app.post('/scheduleSearch/:day', async (req, res) => {
+    //gets the string from the search bar and compares it with the titles of each exercise 
     let search = req.body.search;
     let day = req.params.day;
     res.redirect("/scheduleEditor/" + day + "?search=" + search);
 });
 
+//stores the name of the workout in the specified array in the schedules collection
 app.post('/scheduleSave', async (req, res) => {    
     let workout = req.body.newWorkout;
     let day = req.body.day;
@@ -587,19 +581,26 @@ app.post('/scheduleSave', async (req, res) => {
             .find({ email: req.session.email })
             .project({ [day]: 1 })
             .toArray();
-
-    if (req.body.adding) { //adding to database
-        if (currentWorkouts[0][day][0] == "No workouts") { //when adding to workout that is initially empty
+    
+    //adding to database
+    if (req.body.adding) { 
+        
+        //when adding to workout that is initially empty
+        if (currentWorkouts[0][day][0] == "No workouts") { 
             await scheduleCollection.updateOne({email : req.session.email}, {$pull : {[day] : "No workouts"}})
         }
         await scheduleCollection.updateOne({email : req.session.email}, {$push : {[day] : workout}});
-    } else { //removing from database
+    } 
+    
+    //removing from database
+    else { 
         await scheduleCollection.updateOne({email : req.session.email}, {$pull : {[day] : workout}});
+        //check if removing workout makes array empty
         currentWorkouts = await scheduleCollection
             .find({ email: req.session.email })
             .project({ [day]: 1 })
             .toArray();
-        if (currentWorkouts[0][day].length == 0) { //if removing workout makes array empty
+        if (currentWorkouts[0][day].length == 0) { 
             await scheduleCollection.updateOne({email : req.session.email}, {$push : {[day] : "No workouts"}});
         }
     }
@@ -835,7 +836,7 @@ function getRandomExercises(exercises, count) {
 
 app.get('/', async (req, res) => {
     if (req.session.authenticated) {
-        //Credit: w3schools - create an array with all week day names, 
+        //Credit: w3schools: https://www.w3schools.com/jsref/jsref_getday.asp 
         //use date object to get current day, and use number returned to access day from array
         const weekday = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
         const d = new Date();
@@ -867,9 +868,8 @@ app.get('/', async (req, res) => {
             const result = await userCollection.findOne({ email: req.session.email });
             console.log(result);
 
-            //get the id's of the current days workouts
+            //get all the info about the current days exercise; used for linking the exercise to its full page 
             let workoutIDs = [];
-
             for (let i = 0; i < todaysWorkouts[0][today].length; i++) {
                 for (let j = 0; j < jsonData.length; j++) {
                     if (todaysWorkouts[0][today][i] == jsonData[j].name) {
