@@ -23,64 +23,70 @@ API's:
 - WGER fitness API: https://wger.de/en/software/api 
 
 Node modules and other technologies: 
-- axios ----------------------version 1.6.8
-- bcrypt ---------------------version 5.1.0
-- bootstrap ------------------version 4.0.0
-- connect-mongo --------------version 4.6.0
-- crypto ---------------------version 1.0.1
-- dotenv ---------------------version 16.0.3
-- ejs ------------------------version 3.1.10
-- express --------------------version 4.19.2
-- express-session ------------version 1.17.3
-- joi ------------------------version 17.8.4
-- multer ---------------------version 1.4.5-lts.1
-- nodemailer -----------------verion 6.9.13
+- axios -version 1.6.8
+- bcrypt version 5.1.0
+- bootstrap version 4.0.0
+- connect-mongo --version 4.6.0
+- crypto version 1.0.1
+- dotenv version 16.0.3
+- ejs version 3.1.10
+- express --version 4.19.2
+- express-session version 1.17.3
+- joi version 17.8.4
+- multer version 1.4.5-lts.1
+- nodemailer --verion 6.9.13
 - nodemailer-smtp-transport --version 2.7.4
-- openai ---------------------version 4.43.0
-- readline -------------------version 1.3.0
-- serve-favicon --------------version 2.5.0
+- openai version 4.43.0
+- readline -version 1.3.0
+- serve-favicon --version 2.5.0
 
 # Files
-- +---dist
-- - |   \---exercises.json
-- +---exercises
-- +---node_modules
-- +---public
-- - |   +---css
-- - - |   |   \---homeAuthenticated
-- - |   \---js
-- - - |       +---accountRetrieval.js
-- - - |       +---editProfile.js 
-- - - |       +---goalsHome.js
-- - - |       \---schedule.js
-- +---views
-- - |   +---404.ejs 
-- - |   +---ai.ejs
-- - |   +---editProfile.ejs
-- - |   +---exercise.ejs
-- - |   +---exerciselist.ejs 
-- - |   +---goals.ejs 
-- - |   +---homeAuthenticated.ejs 
-- - |   +---homeUnauthenticated.ejs 
-- - |   +---loginForm.ejs 
-- - |   +---passwordReset.ejs
-- - |   +---schedule.ejs 
-- - |   +---scheduleEditor.ejs 
-- - |   +---signUpForm.ejs 
-- - |   +---userProfile.ejs   
-- - |   \---templates
-- - - |        +---footer.ejs
-- - - |        +---header.ejs
-- - - |        +---modalEditor.ejs
-- - - |        \---navbar.ejs
-- +---.env
-- +---.gitignore
-- +---databaseConnection.js
-- +---index.js
-- +---package-lock.json
-- +---package.json
-- +---README.md
-- +---utils.js
+1.  dist
+    1.  exercises.json
+2. exercises
+3. node_modules
+4. public
+    1. css
+        1. editProfile.css 
+        2. homeAuthenticated.css
+        3. loginForm.css
+        4. signupForm.css
+    2. js
+        1. accountRetrieval.js
+        2. ai.js
+        3. editProfile.js 
+        4. goalsHome.js
+        5. schedule.js
+    3. favicon.ico
+    4. WeFitLogo.png
+5. views
+    1. templates
+        1. footer.ejs
+        2. header.ejs
+        3. modalEditor.ejs
+        4. navbar.ejs
+    2. 404.ejs 
+    3. ai.ejs
+    4. editProfile.ejs
+    5. exercise.ejs
+    6. exerciselist.ejs 
+    7. goals.ejs 
+    8. homeAuthenticated.ejs 
+    9. homeUnauthenticated.ejs 
+    10. loginForm.ejs 
+    11. passwordReset.ejs
+    12. schedule.ejs 
+    13. scheduleEditor.ejs 
+    14. signUpForm.ejs 
+    15. userProfile.ejs   
+6. .env
+7. .gitignore
+8. databaseConnection.js
+9. index.js
+10. package-lock.json
+11. package.json
+12. README.md
+13. utils.js
 
 # Installation
 1. Fork the repo from GitHub
