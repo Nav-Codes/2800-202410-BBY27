@@ -21,7 +21,7 @@ const fspromise = require("fs").promises;
 app.use(express.urlencoded({ extended: false }));
 
 // Serve static files from the dist/exercises directory
-app.use("/exercises", express.static(path.join("exercises")));
+app.use("/exercises", express.static(path.join("public", "images", "exercises")));
 app.use(express.static(__dirname));
 app.use("/login", express.static(path.join(__dirname, "/public/js")));
 
@@ -568,7 +568,7 @@ app.get("/scheduleEditor/:day", async (req, res) => {
 
     try {
       // Read the JSON file
-      fs.readFile("./dist/exercises.json", "utf8", (err, data) => {
+      fs.readFile("./public/json/exercises.json", "utf8", (err, data) => {
         if (err) {
           console.error("Error reading file:", err);
           res.status(500).send("Internal Server Error");
@@ -789,7 +789,7 @@ app.post("/contribute", async (req, res) => {
 app.get("/exercise/:id", (req, res) => {
   try {
     // Read the JSON file
-    fs.readFile("./dist/exercises.json", "utf8", (err, data) => {
+    fs.readFile("./public/json/exercises.json", "utf8", (err, data) => {
       if (err) {
         console.error("Error reading file:", err);
         res.status(500).send("Internal Server Error");
@@ -816,7 +816,7 @@ app.get("/exercise/:id", (req, res) => {
 app.get("/exercises", (req, res) => {
   try {
     // Read the JSON file
-    fs.readFile("./dist/exercises.json", "utf8", (err, data) => {
+    fs.readFile("./public/json/exercises.json", "utf8", (err, data) => {
       if (err) {
         console.error("Error reading file:", err);
         res.status(500).send("Internal Server Error");
@@ -951,7 +951,7 @@ app.get("/", async (req, res) => {
       .toArray();
     try {
       // Read the JSON file
-      const data = await fspromise.readFile("./dist/exercises.json", "utf8");
+      const data = await fspromise.readFile("./public/json/exercises.json", "utf8");
       let jsonData = JSON.parse(data);
 
       let searchParam = req.query.search || "";
