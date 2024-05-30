@@ -111,10 +111,51 @@ function createSchedule(email) {
     console.log('created empty schedule');
 }
 
+//sends a confirmation email to the user to let them know that the email they submitted was valid
+async function sendConfirmationEmail(res, email) {
+    let transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+          user: 'wefitpass@gmail.com',
+          pass: 'ghcjcvmhksrcxpqp '
+        }
+      });
+    try {
+        await transporter.sendMail({
+            from: 'wefitpass@gmail.com',
+            to: email,
+            subject: 'WeFit New User',
+            html: `
+                <h1>Welcome to WeFit!</h1>
+                <p>Thank you for joining WeFit. This email is just to let you know that you have submitted a valid email. No futher action is required.</p><br>
+                <a href="https://two800-202410-bby27.onrender.com/"><img src="cid:WeFitLogo" alt="WeFit Logo" style="width: 300px; height: 100px"></a>
+            `,
+            //Credit: ChatGPT - use a cid to display the image in the email and use the attachments option from sendMail function to include the image
+            attachments: [{
+                filename: 'WeFitLogo.png',
+                path: path.join(__dirname, '/public/WeFitLogo.png'),
+                cid: 'WeFitLogo' // same cid value as in the html img src
+            }]
+            });
+    } catch (error) {
+        // Handle errors that occur during email sending
+        console.error('Error sending email:', error);
+        // You can also send a response indicating that there was an error
+        res.status(500).send('Error sending email');
+    }
+}
+
 app.post('/submitUser', async (req,res) => {
     var email = req.body.email;
     var name = req.body.name;
     var password = req.body.password;
+
+    if (!(email.includes("@gmail.com") || email.includes("@yahoo.com") || email.includes("@outlook.com") || email.includes("@icloud.com"))) {
+        res.render("signUpForm",{duplicate: 1, InvalidField: 0})
+        return;
+    } else {
+        sendConfirmationEmail(res, email);
+    }
 
 	const schema = Joi.object(
 		{
@@ -215,7 +256,7 @@ app.post('/forgotpassword', async (req, res) => {
                 <p>If you did not request a password reset, please ignore this email.</p>
                 <a href="https://two800-202410-bby27.onrender.com/"><img src="cid:WeFitLogo" alt="WeFit Logo" style="width: 300px; height: 100px"></a>
             `,
-            //Credit: ChatGPT - use a cid to display the image in the email and use the attatchments option from sendMail function to include the image
+            //Credit: ChatGPT - use a cid to display the image in the email and use the attachments option from sendMail function to include the image
             attachments: [{
                 filename: 'WeFitLogo.png',
                 path: path.join(__dirname, '/public/WeFitLogo.png'),
