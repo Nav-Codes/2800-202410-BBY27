@@ -4,7 +4,8 @@
             <div class="col">
                 <h2 class="text-center">Weekly Workout Schedule</h2>
                 <div class="scrolling-wrapper">
-                    <%  for (let day in workouts[0]) {
+                    <%  //this for loop generates the cards
+                        for (let day in workouts[0]) {
                             if (workouts[0][day][0] == undefined) {
                                 continue;
                             } 
@@ -15,22 +16,24 @@
                                     <%= currentDay; %>
                                 </h5>
                                 <ul>
-                                    <% for (let j = 0; j < workouts[0][day].length; j++) { %>
+                                    <% //this for loop lists all the workouts correlatedd to a specific day
+                                        for (let j = 0; j < workouts[0][day].length; j++) { %>
                                         <li class="workoutList">
                                             <%= workouts[0][day][j] %>
                                         </li>
                                     <% } %>
                                 </ul>
                             </div>
+
+                            <!-- Edit button -->
                             <form action="/scheduleEditor/<%=currentDay%>" method="get" style="margin: 5%;">
                                 <button class="btn btn-primary">Edit</button>
                             </form>
-                        </div><p></p>
-                    <% } %><br>
+                        </div>
+                        <p></p>
+                    <% } %><br><br><br>
                 </div>
             </div>
         </div>
     </div>
-
-    <!-- edit schedule -->
-    <%-include('templates/footer');%>
+<%-include('templates/footer');%>

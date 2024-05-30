@@ -1,22 +1,8 @@
-<style>
-  .logo-image {
-    width: 180px;
-    height: 50px;
-    overflow: hidden;
-    margin-right: 10px;
-  }
-
-  .navbar-list-item {
-  margin-right: 25px;
-  font-size: 16px;
-  color: #333;
-}
-</style>
-
+<!-- Top of the page navbar -->
 <nav class="navbar fixed-top navbar-expand-lg navbar-light navbar-container" style="background-color: #B3D3FD;">
   <a class="navbar-brand" href="/">
     <div class="logo-image">
-      <img src="/public/WeFitLogo.png" alt="WeFit Logo" class="logo-image">
+      <img src="/favicon.ico" alt="WeFit Logo" class="logo-image">
     </div>
   </a>
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -40,7 +26,6 @@
         </a>
         <div class="dropdown-menu" aria-labelledby="navbarDropdown">
           <a class="dropdown-item" href="/profile">Profile</a>
-          <a class="dropdown-item" href="#">Settings</a>
           <div class="dropdown-divider"></div>
           <% if (authenticated) { %>
           <a class="dropdown-item" href="/logout">Logout</a>
