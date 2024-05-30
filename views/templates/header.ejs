@@ -1,3 +1,4 @@
+<!-- HTML header -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,111 +10,13 @@
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="icon" href="/favicon.ico">
-    
-    <!-- For padding of the navbar -->
-    <style>
-
-        /* Base styles for header and footer */
-        .header, .footer {
-            display: none;
-        }
-
-        /* Show header only on desktop screens */
-        @media (min-width: 1024px) {
-            .header {
-                display: block;
-            }
-
-            .container {
-            padding-top: 80px;
-            padding-left: 20px;
-            padding-right: 20px;
-        }
-        }
-
-        /* Show footer only on mobile screens */
-        @media (max-width: 1023px) {
-            .footer {
-                display: block;
-            }
-
-            .container {
-                padding-top: 80px;
-                padding-left: 10px;
-                padding-right: 10px;
-            }
-        }
-
-        /* Footer Navbar */
-        .nav {
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-            height: 75px;
-            box-shadow: 0 0 3px rgba(0, 0, 0, 0.2);
-            background-color: #B3D3FD;
-            display: flex;
-            overflow-x: auto;
-            z-index: 1000;
-        }
-
-        .nav__link {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            flex-grow: 1;
-            min-width: 50px;
-            overflow: hidden;
-            white-space: nowrap;
-            font-family: sans-serif;
-            font-size: 13px;
-            color: #444444;
-            text-decoration: none;
-            -webkit-tap-highlight-color: transparent;
-            transition: background-color 0.1s ease-in-out;
-            width: 82.41px; /* Set specific width */
-        }
-
-        .nav__link:hover {
-            background-color: #eeeeee;
-        }
-
-        .nav__icon {
-            font-size: 34px;
-        }
-
-        span {
-            text-align: center;
-        }
-    </style>
+    <link rel="stylesheet" href="../../public/css/header.css">
 </head>
 <body>
     <div class="container header">
         <%- include('./navbar.ejs') %>
     </div>
 
-    <!-- https://www.youtube.com/watch?app=desktop&v=uHL6aeWUEQQ -->
-    <nav class="nav footer">
-        <a href="/exercises" class="nav__link">
-          <i class="material-icons" style="font-size: 30px;">fitness_center</i>
-          <span class="nav__text">Explorer</span>
-        </a>
-        <a href="/schedule" class="nav__link">
-            <i class="material-icons nav__icon">calendar_month</i>
-            <span class="nav__text">Plan</span>
-        </a>
-        <a href="/" class="nav__link">
-            <i class="material-icons nav__icon">home</i>
-            <span class="nav__text">Home</span>
-        </a>
-        <a href="/ai" class="nav__link">
-            <i class="material-icons nav__icon">smart_toy</i>
-            <span class="nav__text">AI</span>
-        </a>
-        <a href="/profile" class="nav__link">
-            <i class="material-icons nav__icon">person</i>
-            <span class="nav__text">Profile</span>
-          </a>
-      </nav>
+    <%- include('./navfooter.ejs') %>
+
         

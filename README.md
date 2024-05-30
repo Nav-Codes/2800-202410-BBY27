@@ -41,30 +41,35 @@ Node modules and other technologies:
 - serve-favicon --version 2.5.0
 
 # Files
-1.  dist
-    1.  exercises.json
-2. exercises
-3. node_modules
-4. public
+1. node_modules
+2. public
     1. css
         1. editProfile.css 
-        2. homeAuthenticated.css
-        3. loginForm.css
-        4. signupForm.css
-    2. js
+        2. header.css
+        3. homeAuthenticated.css
+        4. homeUnauthenticated.css
+        5. loginForm.css
+        6. signUpForm.css
+        7. userProfile.css
+    2. images
+        1. exercises
+        2. favicon.ico
+    3. js
         1. accountRetrieval.js
         2. ai.js
         3. editProfile.js 
-        4. goalsHome.js
-        5. schedule.js
-    3. favicon.ico
-    4. WeFitLogo.png
+        4. goals.js
+        5. goalsHome.js
+        6. schedule.js
+    4. json
+        1. exercises.json
 5. views
     1. templates
         1. footer.ejs
         2. header.ejs
-        3. modalEditor.ejs
+        3. modalEdit.ejs
         4. navbar.ejs
+        5. navfooter.ejs
     2. 404.ejs 
     3. ai.ejs
     4. editProfile.ejs
