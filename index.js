@@ -1,75 +1,75 @@
-//express constants
+// Required utility functions
 require("./utils.js");
 
-//express constants
+// Import necessary modules
 const express = require("express");
 const favicon = require("serve-favicon");
 const path = require("path");
-const app = express();
 const nodemailer = require("nodemailer");
 const { createHmac } = require("node:crypto");
-
 const multer = require("multer");
-const storage = multer.memoryStorage();
-const upload = multer({ storage: storage });
-
-app.use(favicon(path.join(__dirname, "public", "images", "favicon.ico")));
-
 const session = require("express-session");
 const fs = require("fs");
 const fspromise = require("fs").promises;
+const MongoStore = require("connect-mongo");
+const bodyParser = require("body-parser");
+const bcrypt = require("bcrypt");
+const Joi = require("joi");
+
+// Initialize Express application
+const app = express();
+
+// Setup file upload storage in memory
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
+
+// Serve favicon
+app.use(favicon(path.join(__dirname, "public", "images", "favicon.ico")));
+
+// Parse URL-encoded bodies (as sent by HTML forms)
 app.use(express.urlencoded({ extended: false }));
 
-// Serve static files from the dist/exercises directory
+// Serve static files
 app.use("/exercises", express.static(path.join("public", "images", "exercises")));
 app.use(express.static(__dirname));
 app.use("/login", express.static(path.join(__dirname, "/public/js")));
 
+// Set the view engine to EJS
 app.set("view engine", "ejs");
 
-//port
+// Define the port
 const port = process.env.PORT || 3000;
 
+// Load environment variables from .env file
 require("dotenv").config();
 
-//main mongo connector
-const MongoStore = require("connect-mongo");
+// Salt rounds for bcrypt hashing
 const saltRounds = 12;
 
-//session expire time an hour
-const expireTime = 3600 * 1000;
+// Session expiration time (1 hour)
+const expireTime = 3600 * 1000; // 3600 seconds * 1000 milliseconds
 
-//openai
+// Initialize OpenAI API
 const openai_api_key = process.env.OPENAI_API_KEY;
 const { OpenAI } = require("openai");
 const openai = new OpenAI(openai_api_key);
 
-const bodyParser = require("body-parser");
+// Parse JSON bodies (as sent by API clients)
 app.use(bodyParser.json());
 
-//crypt const
-const bcrypt = require("bcrypt");
-
-const Joi = require("joi");
-
-//collections in database
+// MongoDB collections
 var { database } = include("databaseConnection.js");
-const userCollection = database
-  .db(process.env.MONGODB_DATABASE)
-  .collection(process.env.MONGODB_COLLECTION);
-const scheduleCollection = database
-  .db(process.env.MONGODB_DATABASE)
-  .collection(process.env.MONGODB_COLLECTION_SCHEDULE);
+const userCollection = database.db(process.env.MONGODB_DATABASE).collection(process.env.MONGODB_COLLECTION);
+const scheduleCollection = database.db(process.env.MONGODB_DATABASE).collection(process.env.MONGODB_COLLECTION_SCHEDULE);
 
-/* secret information section */
+/* Secret information section */
 const mongodb_host = process.env.MONGODB_HOST;
 const mongodb_user = process.env.MONGODB_USER;
 const mongodb_password = process.env.MONGODB_PASSWORD;
 const mongodb_session_secret = process.env.MONGODB_SESSION_SECRET;
-
 const node_session_secret = process.env.NODE_SESSION_SECRET;
-/* END secret section */
 
+// Configure session store with MongoDB
 var mongoStore = MongoStore.create({
   mongoUrl: `mongodb+srv://${mongodb_user}:${mongodb_password}@${mongodb_host}/sessions`,
   crypto: {
@@ -77,10 +77,11 @@ var mongoStore = MongoStore.create({
   },
 });
 
+// Use session middleware
 app.use(
   session({
     secret: node_session_secret,
-    store: mongoStore, //default is memory store
+    store: mongoStore, // Use MongoDB for session storage
     saveUninitialized: false,
     resave: true,
   })
