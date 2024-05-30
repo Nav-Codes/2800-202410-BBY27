@@ -1,7 +1,11 @@
 <%-include('templates/header');%>
-    <h1 id="dayOfWeek" name="<%= day %>"><%= day %></h1><br>
+    <h1 id="dayOfWeek" style="margin: 1%;" name="<%= day %>"><%= day %></h1><br>
+
+    <!-- Filters -->
     <div class="col-md-4">
         <form action="/scheduleSearch/<%= day %>" method="post" class="d-flex">
+            
+            <!-- Difficulty filter -->
             <div class="dropdown me-2">
                 <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     Difficulty
@@ -12,49 +16,78 @@
                     <a class="dropdown-item" href="/scheduleEditor/<%= day %>?filter=expert">Expert</a>
                 </div>
             </div>&ensp;
+
+            <!-- Search filter -->
             <input name="search" id="searchbar" class="form-control me-2" type="search" placeholder="Search" aria-label="Search" value="<%= searchParam %>">&ensp;
             <a class="btn btn-outline-danger" href="/scheduleEditor/<%= day %>">Reset</a>            
         </form><p></p>  
     </div>
+
+    <!-- Dropdown list of current exercises in list -->
     <div class="dropdown show text-center">
         <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
           Current Exercises
         </a>
         <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-            <ul class="list-group">
+            <ul class="list-group" style="margin: 5%;">
             <% var exercises = workouts[0][day]; //represents the exercises currently in schedule
                 for (let j = 0; j < workouts[0][day].length; j++) { 
                     if (workoutIDs.length == 0) { %>
                         <p>No workouts</p>
                         <% break;
                     } %>
-                    <a style="font-size:large;" href="/exercise/<%= workoutIDs[j].id %>"><%= workouts[0][day][j] %></a>
-            <% } %>
-        </ul>
+                    <a style="font-size:large;" href="/exercise/<%= workoutIDs[j].id %>"><%= workouts[0][day][j] %></a><p></p>
+            <% } %> <br>
+            <% if (workoutIDs.length != 0) { %>
+                <button id="clearWorkoutsButton" class="btn btn-outline-danger" data-toggle="modal" data-target="#clearWorkoutsModal">Clear All</button>
+            <% } %>       
+            </ul>
         </div>
     </div>
-        <br>
-        <!-- workouts listed -->
-        <ul class="list-unstyled">
-        <% exercisesInfo.forEach(exercise => { %>
-            <li id="<%= exercise.name %>" class="mb-3 ">
-                <a href="/exercise/<%= exercise.id %>" class="text-decoration-none">
-                    <div class="card">
-                        <div class="card-body">
-                            <!-- Credit: ChatGPT - helped with checkmarking workouts that are already in your workout list -->
-                            <input type="checkbox" <%= exercises.includes(exercise.name) ? 'checked' : '' %> class="selectedWorkout" 
-                                id="<%=exercise.name%>" name="work" value="<%=exercise.name%>">
-                            <i id="<%=exercise.name%>" style="color: black;"> Add Workout</i><p></p>
-                            <h5 class="card-title"><%= exercise.name %></h5>
-                            <p class="card-text" style="color: black;">Muscles: <%= exercise.primaryMuscles[0].charAt(0).toUpperCase() + exercise.primaryMuscles[0].slice(1) %><br>Difficulty: <%=exercise.level.charAt(0).toUpperCase() + exercise.level.slice(1) %></p>
-                        </div>
+    <br>
+
+    <!-- Modal for the clear list button -->
+    <div class="modal fade" id="clearWorkoutsModal" tabindex="-1" role="dialog" aria-labelledby="clearWorkoutsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="clearWorkoutsModalLabel">Confirm Deletion</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to clear your list of workouts for <%= day %>?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="button" id="clearWorkouts" class="btn btn-danger">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- List of workouts -->
+    <ul class="list-unstyled">
+    <% exercisesInfo.forEach(exercise => { %>
+        <li id="<%= exercise.name %>" class="mb-3 ">
+            <a href="/exercise/<%= exercise.id %>" class="text-decoration-none">
+                <div class="card">
+                    <div class="card-body">
+                        <!-- Credit: ChatGPT - helped with checkmarking workouts that are already in your workout list -->
+                        <input type="checkbox" <%= exercises.includes(exercise.name) ? 'checked' : '' %> class="selectedWorkout" 
+                            id="<%=exercise.name%>" name="work" value="<%=exercise.name%>">
+                        <i id="<%=exercise.name%>" style="color: black;"> Add Workout</i><p></p>
+                        <h5 class="card-title"><%= exercise.name %></h5>
+                        <p class="card-text" style="color: black;">Muscles: <%= exercise.primaryMuscles[0].charAt(0).toUpperCase() + exercise.primaryMuscles[0].slice(1) %><br>Difficulty: <%=exercise.level.charAt(0).toUpperCase() + exercise.level.slice(1) %></p>
                     </div>
-                </a>
-            </li>
-        <% }); %>
+                </div>
+            </a>
+        </li>
+    <% }); %>
     </ul>
 
-    <!-- pagination -->
+    <!-- Pagination buttons -->
     <nav aria-label="Page navigation">
         <ul class="pagination justify-content-center">
             <li class="page-item <%= currentPage === 1 ? 'disabled' : '' %>">
