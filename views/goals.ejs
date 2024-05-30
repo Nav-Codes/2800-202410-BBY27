@@ -20,7 +20,7 @@
         </div>
     </div>
 </div>
-<!-- End Confirmation Modal -->
+
 
 <div class="container mt-5">
 
@@ -63,7 +63,7 @@
     <div class="list-group">
       <% if (result && result.goal && result.goal.length > 0) { %>
           <% result.goal.forEach((item, index) => { %>
-              <div class="list-group-item position-relative mb-3"> <!-- Added mb-3 for spacing -->
+              <div class="list-group-item position-relative mb-3">
                   <div class="goal-info">
                       <strong><%= item[2] %>:</strong>
                       <div><%= item[3] %> <%= item[1] %> / <%= item[0] %> <%= item[1] %> completed.</div>
@@ -72,7 +72,7 @@
                       <form id="contributeForm" action="/contribute" method="post">
                           <input type="hidden" name="goalIndex" value="<%= index %>">
                           <div class="input-group">
-                              <input name="quantity" type="text" class="form-control form-control-sm" id="quantity" placeholder="Amount Complete" required>
+                              <input name="quantity" type="number" class="form-control form-control-sm" id="quantity" placeholder="Amount Complete" required>
                               <div class="input-group-append">
                                   <button type="submit" class="btn btn-primary btn-sm">Contribute</button>
                               </div>
@@ -82,7 +82,11 @@
                   <form id="deleteGoalForm<%= index %>" action="/deletegoal" method="post" class="position-absolute" style="top: 10px; right: 20px;">
                     <input type="hidden" name="goalIndex" value="<%= index %>">
                     <button type="button" class="btn btn-danger btn-sm delete-goal-btn" data-toggle="modal" data-target="#confirmationModal">Delete Goal</button>
-                </form>              
+                </form>     
+                <div class="custom-control custom-checkbox mt-2">
+                    <input type="checkbox" class="custom-control-input" id="trackGoal<%= index %>" <%= item[4] === true ? 'checked' : '' %>>
+                    <label class="custom-control-label" for="trackGoal<%= index %>">Track Goal</label>
+                </div>         
               </div>
           <% }); %>
       <% } else { %>
@@ -100,20 +104,7 @@
 
 <%- include('templates/footer'); %>
 
-<!-- JavaScript for Delete Action -->
-<script>
-    $(document).ready(function() {
-        // Handle delete action when the "Delete" button in the confirmation modal is clicked
-        $('#confirmDelete').on('click', function() {
-            var goalIndex = $('#confirmationModal').data('goal-index');
-            $('#deleteGoalForm' + goalIndex).submit();
-        });
+<script src="../public/js/goals.js"></script>
 
-        // Store the goal index when the confirmation modal is shown
-        $('#confirmationModal').on('show.bs.modal', function(event) {
-            var button = $(event.relatedTarget); // Button that triggered the modal
-            var goalIndex = button.closest('form').find('input[name="goalIndex"]').val(); // Get the goal index from the form
-            $(this).data('goal-index', goalIndex); // Store the goal index in the modal data
-        });
-    });
-</script>
+
+
