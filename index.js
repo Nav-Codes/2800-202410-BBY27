@@ -225,14 +225,18 @@ app.post('/forgotpassword', async (req, res) => {
             text: `link: ${resetLink}`
             });
 
-        res.json({status:"success", message:"Thank you for submitting your request. If a valid email was used, an email will be sent to that account. Please check your inbox for further information."});
-    } catch (error) {
-        // Handle errors that occur during email sending
-        console.error('Error sending email:', error);
-        // You can also send a response indicating that there was an error
-        res.status(500).send('Error sending email');
-    }
-});
+
+    res.json({
+      status: "success",
+      message:
+        "Thank you for submitting your request. If a valid email was used, an email will be sent to that account. Please check your inbox for further information.",
+    });
+  } catch (error) {
+    // Handle errors that occur during email sending
+    console.error("Error sending email:", error);
+    //You can also send a response indicating that there was an error
+    res.status(500).send("Error sending email");
+  }
 
 app.post('/uploadProfilePicture', upload.single('profilePicture'), async (req, res) => {
     if (!req.session.authenticated) {
