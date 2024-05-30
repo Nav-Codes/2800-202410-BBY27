@@ -135,6 +135,14 @@ Testing spreadsheet: https://docs.google.com/spreadsheets/d/1ykLde51TMumc67eQ14d
     5. The variable is then displayed and formatted onto the web app for the user to see. 
 - d. One limitation that we came across was the effectiveness of ChatGPT when trying to seek help from it. Since there are a lot of moving parts to our project, we have to explain thoroughly what the current situation is, the expected result we want, and what the code is currently giving us. It would often take some time to generate a response that actually worked. Sometimes, we would just abandon ChatGPT and try to figure it out ourselves becuase ChatGPT would keep giving us bad responses. One example is the processing of which workouts are going in and out of a users schedule. It took hours to try and get ChatGPT to get something to work, but every iteration had a bug in it. Eventually, the team member gave up and decided to implement the solution on their own, which ended up working just fine.  
 
+# To Do list
+- Train the Ai so it can only help and answer fitness related questions
+- Integrating the Ai with the workout scheduler so it can build schedules for you
+- Adding more filters in the search page
+- Add button to clear the filters
+- Add select/deselect buttons to goals page
+- Integrate Ai with goals 
+
 # Credits
 - ChatGPT: https://chatgpt.com/?oai-dm=1
 - https://www.w3schools.com/jsref/jsref_getday.asp
