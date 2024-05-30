@@ -1,7 +1,10 @@
 <%- include('templates/header'); %>
-
-<link rel="stylesheet" href="/public/css/userProfile.css">
-    
+<style>
+    .profile-picture {
+        width: 175px;
+        height: 175px; 
+    }
+</style>
 <div class="text-center">
     <p class="h2">Welcome, <%=username%>!</p>
     <img src="/profilePicture" class="profile-picture rounded-circle mx-auto d-block my-3" alt="profile picture">
@@ -11,6 +14,5 @@
 <div class="d-grid gap-2 text-center">
     <a href="/goals"><button class="btn btn-primary" type="button">Goals</button></a><br><br>
     <a href="/schedule"><button class="btn btn-primary" type="button">Workout Schedule</button></a><br><br>
-    <a href="/logout"><button class="btn btn-danger" type="button">Logout</button></a><br><br>
 </div>
 <%- include('templates/footer'); %>
