@@ -304,7 +304,7 @@ app.post("/forgotpassword", async (req, res) => {
   } catch (error) {
     // Handle errors that occur during email sending
     console.error("Error sending email:", error);
-    // You can also send a response indicating that there was an error
+    //You can also send a response indicating that there was an error
     res.status(500).send("Error sending email");
   }
 });
