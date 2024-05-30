@@ -114,26 +114,67 @@ function createSchedule(email) {
   });
   console.log("created empty schedule");
 }
-// standard user submission from web dev
-app.post("/submitUser", async (req, res) => {
-  var email = req.body.email;
-  var name = req.body.name;
-  var password = req.body.password;
 
-  const schema = Joi.object({
-    name: Joi.string()
-      .max(15)
-      .pattern(/^[a-zA-Z0-9]*$/, "alphanumeric")
-      .required(),
-    email: Joi.string().email().required(),
-    password: Joi.string().max(20).required(),
-  });
+//sends a confirmation email to the user to let them know that the email they submitted was valid
+async function sendConfirmationEmail(res, email) {
+    let transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+          user: 'wefitpass@gmail.com',
+          pass: 'ghcjcvmhksrcxpqp '
+        }
+      });
+    try {
+        await transporter.sendMail({
+            from: 'wefitpass@gmail.com',
+            to: email,
+            subject: 'WeFit New User',
+            html: `
+                <h1>Welcome to WeFit!</h1>
+                <p>Thank you for joining WeFit. This email is just to let you know that you have submitted a valid email. No futher action is required.</p><br>
+                <a href="https://two800-202410-bby27.onrender.com/"><img src="cid:WeFitLogo" alt="WeFit Logo" style="width: 300px; height: 100px"></a>
+            `,
+            //Credit: ChatGPT - use a cid to display the image in the email and use the attachments option from sendMail function to include the image
+            attachments: [{
+                filename: 'WeFitLogo.png',
+                path: path.join(__dirname, '/public/WeFitLogo.png'),
+                cid: 'WeFitLogo' // same cid value as in the html img src
+            }]
+            });
+    } catch (error) {
+        // Handle errors that occur during email sending
+        console.error('Error sending email:', error);
+        // You can also send a response indicating that there was an error
+        res.status(500).send('Error sending email');
+    }
+}
 
-  const validationResult = schema.validate({ email, password, name });
-  if (validationResult.error != null) {
-    res.render("signUpForm", { duplicate: 0, InvalidField: 1 });
-    return;
-  }
+app.post('/submitUser', async (req,res) => {
+    var email = req.body.email;
+    var name = req.body.name;
+    var password = req.body.password;
+
+    if (!(email.includes("@gmail.com") || email.includes("@yahoo.com") || email.includes("@outlook.com") || email.includes("@icloud.com"))) {
+        res.render("signUpForm",{duplicate: 1, InvalidField: 0})
+        return;
+    } else {
+        sendConfirmationEmail(res, email);
+    }
+
+    const schema = Joi.object({
+        name: Joi.string()
+          .max(15)
+          .pattern(/^[a-zA-Z0-9]*$/, "alphanumeric")
+          .required(),
+        email: Joi.string().email().required(),
+        password: Joi.string().max(20).required(),
+      });
+    
+      const validationResult = schema.validate({ email, password, name });
+      if (validationResult.error != null) {
+        res.render("signUpForm", { duplicate: 0, InvalidField: 1 });
+        return;
+      }
 
   var hashedPassword = await bcrypt.hash(password, saltRounds);
 
@@ -175,6 +216,7 @@ app.post("/submitUser", async (req, res) => {
         password: hashedPassword,
         name: name,
       });
+      
 
       // Set user details in the session
       req.session.authenticated = true;
@@ -232,15 +274,26 @@ app.post("/forgotpassword", async (req, res) => {
       pass: "ghcjcvmhksrcxpqp ",
     },
   });
-  const host = req.get("host");
-  const resetLink = `http://${host}/resetpassword/${hash}`;
-  try {
-    await transporter.sendMail({
-      from: "wefitpass@gmail.com",
-      to: email,
-      subject: "AccountInfo",
-      text: `link: ${resetLink}`,
-    });
+  const host = req.get('host');
+      const resetLink = `http://${host}/resetpassword/${hash}`;
+    try {
+        await transporter.sendMail({
+            from: 'wefitpass@gmail.com',
+            to: email,
+            subject: 'WeFit Password Reset',
+            html: `
+                <p>Click the following link to reset your password:</p>
+                <a href="${resetLink}">Reset Password</a>
+                <p>If you did not request a password reset, please ignore this email.</p>
+                <a href="https://two800-202410-bby27.onrender.com/"><img src="cid:WeFitLogo" alt="WeFit Logo" style="width: 300px; height: 100px"></a>
+            `,
+            //Credit: ChatGPT - use a cid to display the image in the email and use the attachments option from sendMail function to include the image
+            attachments: [{
+                filename: 'WeFitLogo.png',
+                path: path.join(__dirname, '/public/WeFitLogo.png'),
+                cid: 'WeFitLogo' // same cid value as in the html img src
+            }]
+            });
 
     res.json({
       status: "success",
@@ -338,8 +391,8 @@ app.get("/profilePicture", async (req, res) => {
   }
 });
 
-app.post("/editUser", async (req, res) => {
-  let newUser = req.body.name;
+app.post('/editUsername', async(req, res) => {
+    let newUser = req.body.name;
 
   let user = req.session.email;
 
@@ -350,9 +403,9 @@ app.post("/editUser", async (req, res) => {
   res.json({ message: "Username Successfully Changed" });
 });
 
-app.post("/editPass", async (req, res) => {
-  let curr = req.body.curr;
-  let newPass = req.body.newPass;
+app.post('/editPassword', async(req, res) => {
+    let curr = req.body.curr;
+    let newPass = req.body.newPass;
 
   let user = req.session.email;
 
@@ -646,10 +699,10 @@ app.post("/scheduleSearch/:day", async (req, res) => {
   res.redirect("/scheduleEditor/" + day + "?search=" + search);
 });
 
-//stores the name of the workout in the specified array in the schedules collection
-app.post("/scheduleSave", async (req, res) => {
-  let workout = req.body.newWorkout;
-  let day = req.body.day;
+//adds or removes the name of the workout in the specified array in the schedules collection
+app.post('/scheduleSave', async (req, res) => {    
+    let workout = req.body.newWorkout;
+    let day = req.body.day;
 
   let currentWorkouts = await scheduleCollection
     .find({ email: req.session.email })
@@ -670,7 +723,6 @@ app.post("/scheduleSave", async (req, res) => {
       { $push: { [day]: workout } }
     );
   }
-
   //removing from database
   else {
     await scheduleCollection.updateOne(
@@ -690,6 +742,13 @@ app.post("/scheduleSave", async (req, res) => {
     }
   }
   res.redirect("/scheduleEditor/" + day);
+});
+
+app.post('/scheduleClear', async (req, res) => {
+    //clears list of workouts for given day by setting the array to default value of No workouts
+    let emptyWorkoutArray = ["No workouts"];
+    await scheduleCollection.updateOne({email : req.session.email}, {$set : {[req.body.day] : emptyWorkoutArray}});
+    res.redirect('/scheduleEditor/' + req.body.day)
 });
 
 app.post("/trackGoal", async (req, res) => {
