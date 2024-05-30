@@ -15,30 +15,15 @@ function ajaxPOST(url, data, callback) {
     xhr.send(JSON.stringify(data));
 }
 
-//gets the day of the week that is being edited
-var selectedDay = document.getElementById('dayOfWeek').innerHTML;
+var myDay = document.getElementById('dayOfWeek').innerHTML;
 
-//event listener for when a checkbox is clicked on a workout
+//place event listener out here and call function when the checkbox is pressed
 var checkbox = document.querySelectorAll(".selectedWorkout").forEach(function(currentElement, currentIndex, listObj) {
     currentElement.addEventListener("click", function(e) {
         if (currentElement.checked) {
-            //add workout to database
-            ajaxPOST('/scheduleSave', 
-            {newWorkout: currentElement.id, day : selectedDay, adding: true}, 
-            (val) => {console.log(val)});
+            ajaxPOST('/scheduleSave', {newWorkout: currentElement.id, day : myDay, adding: true}, (val) => {console.log(val)});
         } else {
-            //remove workout from database
-            ajaxPOST('/scheduleSave', 
-            {newWorkout: currentElement.id, day : selectedDay, adding: false}, 
-            (val) => {console.log(val)});
+            ajaxPOST('/scheduleSave', {newWorkout: currentElement.id, day : myDay, adding: false}, (val) => {console.log(val)});
         }
     })
-});
-
-//clears the list of workouts for the given day 
-document.getElementById("clearWorkouts").addEventListener("click", function(e) {
-    document.querySelectorAll(".selectedWorkout").forEach(function(currentElement, currentIndex, listObj) {
-        ajaxPOST('/scheduleClear', {day : selectedDay}, (val) => {console.log(val)});
-    });
-    location.reload();
 });
