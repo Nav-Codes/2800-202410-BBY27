@@ -286,13 +286,13 @@ app.post("/forgotpassword", async (req, res) => {
                 <p>Click the following link to reset your password:</p>
                 <a href="${resetLink}">Reset Password</a>
                 <p>If you did not request a password reset, please ignore this email.</p>
-                <a href="https://two800-202410-bby27.onrender.com/"><img src="cid:WeFitLogo" alt="WeFit Logo" style="width: 300px; height: 100px"></a>
+                <a href="https://two800-202410-bby27.onrender.com/"><img src="cid:favicon" alt="WeFit Logo" style="width: 300px; height: 100px"></a>
             `,
             //Credit: ChatGPT - use a cid to display the image in the email and use the attachments option from sendMail function to include the image
             attachments: [{
-                filename: 'WeFitLogo.png',
-                path: path.join(__dirname, '/public/WeFitLogo.png'),
-                cid: 'WeFitLogo' // same cid value as in the html img src
+                filename: 'favicon.ico',
+                path: path.join(__dirname, '/public/images/favicon.ico'),
+                cid: 'favicon' // same cid value as in the html img src
             }]
             });
 
