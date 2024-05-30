@@ -308,6 +308,7 @@ app.post("/forgotpassword", async (req, res) => {
     //You can also send a response indicating that there was an error
     res.status(500).send("Error sending email");
   }
+});
 
 app.post(
   "/uploadProfilePicture",
